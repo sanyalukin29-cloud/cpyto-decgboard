@@ -243,6 +243,13 @@ footer{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);t
       <div class="pt"><span class="b"></span>📊 เปรียบเทียบกลยุทธ์ออก · EXIT STRATEGY LAB</div>
       <div id="sg"><div class="loading">⟳</div></div>
     </div>
+    
+    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="pt"><span class="b"></span>🆚 เปรียบเทียบ v1 vs v2 · A/B TEST
+        <span class="info">i<span class="tip">v1 = จับทุกเหรียญ | v2 = จับเฉพาะเหรียญพุ่งยังไม่ถึง +30% — ถ้า v2 ชนะ v1 ชัดเจนที่ 200 สัญญาณ = v2 คือกลยุทธ์ใหม่</span></span>
+      </div>
+      <div id="abCompare"><div class="loading">⟳ กำลังโหลด…</div></div>
+    </div>
     <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
       <div class="pt"><span class="b"></span>⏱ จังหวะเข้าที่ดีที่สุด · ENTRY TIMING</div>
       <div id="eg"><div class="loading">⟳</div></div>
@@ -338,7 +345,7 @@ function scoreBg(s){return s>=70?"rgba(77,242,176,.12)":s>=50?"rgba(255,194,75,.
 
 async function load(){
   try{
-    const[sigs,outs,alt,hArr,qual,evts,clog,stratLab,entryLab,scored,strat]=await Promise.all([
+    const[sigs,outs,alt,hArr,qual,evts,clog,stratLab,entryLab,scored,strat,perfByVer,v2Air]=await Promise.all([
       get("meme_signals?select=*&order=scanned_at.desc&limit=300"),
       get("meme_outcomes?select=*&limit=3000"),
       get("alt_trades?select=*&order=opened_at.desc&limit=200"),
@@ -350,6 +357,8 @@ async function load(){
       get("entry_timing_lab?select=*"),
       get("signal_with_score?select=*&order=scanned_at.desc&limit=20"),
       get("strategy_insights?select=*"),
+      get("meme_performance_by_version?select=*"),
+      get("meme_v2_airlock?select=*"),
     ]);
     const tickC=await cnt("meme_price_ticks");
     const h=hArr[0]||{};
@@ -359,9 +368,49 @@ async function load(){
     rFeed(evts);
     rHints(strat[0]||{},clog,entryLab);
     rLab(clog,stratLab,entryLab);
+    rAB(perfByVer,v2Air);
     rScored(scored,outs);
     setLive(true);
   }catch(e){setLive(false,e.message);}
+}
+
+
+function rAB(perfByVer, v2Air){
+  const v1h1=perfByVer.find(r=>r.version==='v1'&&r.horizon==='h1');
+  const v2h1=perfByVer.find(r=>r.version==='v2'&&r.horizon==='h1');
+  const v2a=v2Air&&v2Air[0]||{};
+  const v2Sigs=v2a.signals||0;
+  const cols=[
+    {k:'สัญญาณ',v1:v1h1?.n||0,v2:v2Sigs},
+    {k:'เฉลี่ย h1',v1:v1h1?.avg_pnl,v2:v2h1?.avg_pnl},
+    {k:'net avg (หัก2%)',v1:v1h1?.net_avg,v2:v2h1?.net_avg},
+    {k:'ค่ากลาง',v1:v1h1?.median,v2:v2h1?.median},
+    {k:'win rate',v1:v1h1?v1h1.win_pct+'%':null,v2:v2h1?v2h1.win_pct+'%':null},
+  ];
+  const v2Win=v2h1&&v1h1&&v2h1.net_avg>v1h1.net_avg;
+  const badge=v2Sigs<10?'⏳ สะสมข้อมูล':v2Win?'🟢 v2 ดีกว่า v1':'🟡 ยังไม่ชัดเจน';
+  $("#abCompare").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-family:var(--mono);font-size:13px;font-weight:600">${badge}</span>
+      <span style="font-size:11px;color:var(--dim)">v2 = จับเฉพาะ pump <30%</span>
+    </div>
+    <div class="tw"><table><thead><tr>
+      <th>ตัวชี้วัด</th>
+      <th>v1 (ทุกเหรียญ)</th>
+      <th style="color:var(--cyan)">v2 (pump &lt;30% เท่านั้น)</th>
+    </tr></thead><tbody>
+    ${cols.map(c=>{
+      const v1ok=c.v1!=null,v2ok=c.v2!=null;
+      const v2better=typeof c.v1==='number'&&typeof c.v2==='number'&&c.v2>c.v1;
+      return `<tr>
+        <td>${c.k}</td>
+        <td class="${typeof c.v1==='number'?c.v1>0?'pos':'neg':'neu'}">${c.v1==null?'—':typeof c.v1==='number'?pp(c.v1,'%'):c.v1}</td>
+        <td class="${v2better?'pos':typeof c.v2==='number'?c.v2>0?'pos':'neg':'neu'}" style="font-weight:600">${c.v2==null?'—':typeof c.v2==='number'?pp(c.v2,'%'):c.v2}${v2better?' ✓':''}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table></div>
+    ${v2Sigs<30?`<p style="font-size:10.5px;color:var(--dim);margin-top:8px">⏳ v2 มีสัญญาณแค่ ${v2Sigs} ตัว — ต้องการอย่างน้อย 30+ เพื่อสรุปผลได้</p>`:''}
+  `;
 }
 
 function setLive(ok,err){
