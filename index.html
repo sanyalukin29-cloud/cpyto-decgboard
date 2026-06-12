@@ -4,587 +4,476 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PORDEE TRADING · Mission Control</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#03060E; --bg2:#060B18; --panel:rgba(10,18,36,0.72); --panel2:rgba(8,14,28,0.9);
-    --line:rgba(70,160,255,0.20); --line2:rgba(70,160,255,0.08);
-    --cyan:#3FE0FF; --violet:#B98CFF; --mint:#4DF2B0; --coral:#FF6B7E; --amber:#FFC24B; --gold:#FFD66B;
-    --ink:#E4EEFF; --dim:#7C93BE; --dim2:#516586;
-    --mono:'IBM Plex Mono',monospace; --thai:'IBM Plex Sans Thai',sans-serif; --display:'Orbitron',sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg);color:var(--ink);font-family:var(--thai);min-height:100vh;overflow-x:hidden}
-  body{position:relative}
-
-  /* ===== ambient layers ===== */
-  .grid-floor{position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:linear-gradient(rgba(63,224,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(63,224,255,0.05) 1px,transparent 1px);
-    background-size:48px 48px;
-    mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 25%,transparent 95%);
-    -webkit-mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 25%,transparent 95%);}
-  .glow-orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.5;pointer-events:none;z-index:0}
-  .orb1{width:520px;height:520px;background:radial-gradient(circle,#163a6e,transparent 70%);top:-180px;left:-120px}
-  .orb2{width:460px;height:460px;background:radial-gradient(circle,#3a1d6e,transparent 70%);top:10%;right:-160px}
-  .scanlines{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.35;
-    background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,0.18) 2px 4px)}
-  .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:18px 14px 80px}
-
-  /* ===== header ===== */
-  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
-    padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;gap:14px}
-  .logo{width:46px;height:46px;border:1.5px solid var(--cyan);border-radius:10px;display:grid;place-items:center;
-    box-shadow:0 0 22px rgba(63,224,255,0.4),inset 0 0 14px rgba(63,224,255,0.15);position:relative;animation:logospin 8s linear infinite}
-  .logo svg{width:24px;height:24px}
-  @keyframes logospin{to{filter:hue-rotate(360deg)}}
-  .brand h1{font-family:var(--display);font-size:18px;font-weight:900;letter-spacing:0.18em;
-    background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .brand .sub{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:0.3em;margin-top:3px}
-  .status-cluster{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .livebadge{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;
-    padding:7px 14px;border:1px solid var(--line);border-radius:30px;background:var(--panel)}
-  .led{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber)}
-  .led.on{background:var(--mint);box-shadow:0 0 12px var(--mint);animation:pulse 1.6s ease-in-out infinite}
-  .led.off{background:var(--coral);box-shadow:0 0 12px var(--coral)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-  .clock{font-family:var(--mono);font-size:12px;color:var(--dim)}
-
-  /* ===== nav ===== */
-  nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-  .tab{font-family:var(--mono);font-size:12.5px;letter-spacing:0.08em;padding:10px 18px;cursor:pointer;
-    background:transparent;color:var(--dim);border:1px solid var(--line2);border-radius:6px;transition:.18s;position:relative;overflow:hidden}
-  .tab:hover{color:var(--ink);border-color:var(--line)}
-  .tab.active{color:var(--bg);font-weight:600}
-  .tab.active.t-cy{background:var(--cyan);box-shadow:0 0 20px rgba(63,224,255,0.45)}
-  .tab.active.t-vi{background:var(--violet);box-shadow:0 0 20px rgba(185,140,255,0.45)}
-  .tab.active.t-mi{background:var(--mint);box-shadow:0 0 20px rgba(77,242,176,0.45)}
-  .tab.active.t-go{background:var(--gold);box-shadow:0 0 20px rgba(255,214,107,0.45)}
-
-  /* ===== panels ===== */
-  .panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px;
-    backdrop-filter:blur(8px)}
-  .panel .corner{position:absolute;width:12px;height:12px;border:2px solid var(--cyan)}
-  .corner.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}
-  .corner.tr{top:-1px;right:-1px;border-left:0;border-bottom:0}
-  .corner.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}
-  .corner.br{bottom:-1px;right:-1px;border-left:0;border-top:0}
-  .ptitle{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--cyan);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-  .ptitle .bar{width:18px;height:2px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
-
-  .grid{display:grid;gap:14px}
-  .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-  .g3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
-  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-
-  /* ===== stat cells ===== */
-  .cell{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:13px 15px;position:relative}
-  .cell .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:0.16em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:6px}
-  .cell .val{font-family:var(--mono);font-weight:600;font-size:23px;margin-top:5px;line-height:1.1}
-  .cell .hint{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5}
-  .big{font-family:var(--mono);font-weight:700;font-size:30px}
-
-  /* info chip */
-  .info{display:inline-grid;place-items:center;width:14px;height:14px;border:1px solid var(--dim);border-radius:50%;
-    font-size:9px;color:var(--dim);cursor:help;font-family:var(--mono);position:relative;flex-shrink:0}
-  .info:hover{border-color:var(--cyan);color:var(--cyan)}
-  .info .tip{visibility:hidden;opacity:0;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);
-    width:230px;background:#0a1426;border:1px solid var(--cyan);border-radius:6px;padding:10px 12px;
-    font-family:var(--thai);font-size:12px;line-height:1.6;color:var(--ink);text-align:left;z-index:30;
-    box-shadow:0 8px 30px rgba(0,0,0,0.6);transition:.15s;letter-spacing:normal;text-transform:none;font-weight:400}
-  .info:hover .tip{visibility:visible;opacity:1}
-
-  /* ===== health LEDs ===== */
-  .hcell{background:var(--panel2);border-left:3px solid var(--mint);border-radius:0 6px 6px 0;padding:12px 14px}
-  .hcell.bad{border-left-color:var(--coral)}
-  .hcell .hk{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;color:var(--dim);text-transform:uppercase}
-  .hcell .hv{font-family:var(--mono);font-weight:600;font-size:17px;margin-top:4px}
-  .hcell .ht{font-size:11px;color:var(--dim);margin-top:3px}
-
-  /* ===== progress gates ===== */
-  .gate{margin-bottom:16px}
-  .gate .gtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;gap:10px}
-  .gate .gname{font-family:var(--thai);font-size:13.5px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:7px}
-  .gate .gval{font-family:var(--mono);font-size:14px;font-weight:600}
-  .gate .gexp{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.55}
-  .track{height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;position:relative}
-  .fill{height:100%;border-radius:4px;transition:width .6s ease;position:relative}
-  .fill.cy{background:linear-gradient(90deg,#1f6f8f,var(--cyan));box-shadow:0 0 10px var(--cyan)}
-  .fill.vi{background:linear-gradient(90deg,#5a3a8f,var(--violet));box-shadow:0 0 10px var(--violet)}
-  .fill.ok{background:linear-gradient(90deg,#2a8f6a,var(--mint));box-shadow:0 0 10px var(--mint)}
-
-  /* equity reactor */
-  .reactor{display:flex;align-items:center;gap:16px}
-  .ring{position:relative;width:96px;height:96px;flex-shrink:0}
-  .ring svg{transform:rotate(-90deg)}
-  .ring .rc{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-  .ring .rc b{font-family:var(--mono);font-size:18px;font-weight:700;display:block}
-  .ring .rc s{font-family:var(--mono);font-size:8px;color:var(--dim);text-decoration:none;letter-spacing:0.1em}
-
-  /* tables */
-  .tbl-wrap{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:480px}
-  thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--dim);text-transform:uppercase;
-    text-align:right;padding:8px 6px;font-weight:400;border-bottom:1px solid var(--line)}
-  thead th:first-child{text-align:left}
-  tbody td{font-family:var(--mono);text-align:right;padding:10px 6px;border-bottom:1px solid var(--line2)}
-  tbody td:first-child{text-align:left;font-family:var(--thai);font-weight:600}
-  .pos{color:var(--mint)} .neg{color:var(--coral)} .neu{color:var(--dim)}
-
-  /* event feed */
-  .feed{font-family:var(--mono);font-size:11.5px;max-height:230px;overflow-y:auto}
-  .feed .row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
-  .feed .src{flex-shrink:0;width:74px;color:var(--cyan);text-transform:uppercase;font-size:10px}
-  .feed .msg{color:var(--ink);flex:1;word-break:break-word;letter-spacing:normal}
-  .feed .ago{flex-shrink:0;color:var(--dim);font-size:10px}
-  .feed .row.warn .msg{color:var(--amber)}
-  .feed .row.critical .msg{color:var(--coral)}
-
-  /* manual */
-  .manual h2{font-family:var(--display);font-size:15px;letter-spacing:0.1em;color:var(--cyan);margin:22px 0 10px;
-    display:flex;align-items:center;gap:9px}
-  .manual h2:first-child{margin-top:0}
-  .manual h2 .n{font-family:var(--mono);font-size:12px;color:var(--bg);background:var(--cyan);width:24px;height:24px;
-    display:grid;place-items:center;border-radius:6px;box-shadow:0 0 12px var(--cyan)}
-  .manual p{font-size:13.5px;line-height:1.85;color:var(--ink);margin-bottom:10px}
-  .manual .muted{color:var(--dim)}
-  .gloss{display:grid;gap:10px;margin:6px 0 8px}
-  .gitem{background:var(--panel2);border:1px solid var(--line2);border-left:3px solid var(--violet);border-radius:0 6px 6px 0;padding:11px 14px}
-  .gitem .gt{font-family:var(--mono);font-size:13px;color:var(--violet);font-weight:600;margin-bottom:4px}
-  .gitem .gd{font-size:12.5px;line-height:1.7;color:var(--ink)}
-  .callout{background:rgba(63,224,255,0.06);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:12px 0}
-  .callout.warn{background:rgba(255,194,75,0.07);border-color:rgba(255,194,75,0.3)}
-  .callout.danger{background:rgba(255,107,126,0.07);border-color:rgba(255,107,126,0.3)}
-  .callout b{color:var(--cyan)} .callout.warn b{color:var(--amber)} .callout.danger b{color:var(--coral)}
-  .checklist{list-style:none;display:grid;gap:8px;margin:8px 0}
-  .checklist li{display:flex;gap:10px;font-size:13px;line-height:1.6;align-items:flex-start}
-  .checklist li::before{content:'▸';color:var(--mint);flex-shrink:0}
-
-  .hidden{display:none}
-  footer{margin-top:20px;font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:0.06em;line-height:1.9;text-align:center}
-  .loading{text-align:center;padding:30px;color:var(--dim);font-family:var(--mono);font-size:13px}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+:root{--bg:#03060E;--bg2:#060B18;--panel:rgba(10,18,36,0.82);--line:rgba(70,160,255,0.20);--line2:rgba(70,160,255,0.08);--cyan:#3FE0FF;--violet:#B98CFF;--mint:#4DF2B0;--coral:#FF6B7E;--amber:#FFC24B;--gold:#FFD66B;--ink:#E4EEFF;--dim:#7C93BE;--mono:'IBM Plex Mono',monospace;--thai:'IBM Plex Sans Thai',sans-serif;--display:'Orbitron',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);color:var(--ink);font-family:var(--thai);min-height:100vh;overflow-x:hidden}
+.grid-floor{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(63,224,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(63,224,255,0.05) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 25%,transparent 95%)}
+.glow-orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none;z-index:0}
+.orb1{width:520px;height:520px;background:radial-gradient(circle,#163a6e,transparent 70%);top:-180px;left:-120px}
+.orb2{width:460px;height:460px;background:radial-gradient(circle,#3a1d6e,transparent 70%);top:10%;right:-160px}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.18) 2px 4px)}
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:18px 14px 80px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;border:1.5px solid var(--cyan);border-radius:10px;display:grid;place-items:center;box-shadow:0 0 22px rgba(63,224,255,0.4),inset 0 0 14px rgba(63,224,255,0.15);animation:logospin 8s linear infinite}
+.logo svg{width:24px;height:24px}
+@keyframes logospin{to{filter:hue-rotate(360deg)}}
+.brand h1{font-family:var(--display);font-size:18px;font-weight:900;letter-spacing:.18em;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .sub{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.3em;margin-top:3px}
+.status-cluster{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.livebadge{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;padding:7px 14px;border:1px solid var(--line);border-radius:30px;background:var(--panel)}
+.led{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.led.on{background:var(--mint);box-shadow:0 0 12px var(--mint);animation:pulse 1.6s ease-in-out infinite}
+.led.off{background:var(--coral);box-shadow:0 0 12px var(--coral)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.clock{font-family:var(--mono);font-size:12px;color:var(--dim)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;padding:10px 18px;cursor:pointer;background:transparent;color:var(--dim);border:1px solid var(--line2);border-radius:6px;transition:.18s}
+.tab:hover{color:var(--ink);border-color:var(--line)}
+.tab.active.t-cy{background:var(--cyan);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(63,224,255,.45)}
+.tab.active.t-vi{background:var(--violet);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(185,140,255,.45)}
+.tab.active.t-mi{background:var(--mint);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(77,242,176,.45)}
+.tab.active.t-go{background:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(255,214,107,.45)}
+.tab.active.t-or{background:#FF9D4B;color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(255,157,75,.45)}
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.corner{position:absolute;width:12px;height:12px;border:2px solid var(--cyan)}
+.corner.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.corner.tr{top:-1px;right:-1px;border-left:0;border-bottom:0}
+.corner.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}
+.corner.br{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.ptitle{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ptitle .bar{width:18px;height:2px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.cell{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:6px;padding:13px 15px}
+.cell .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.cell .val{font-family:var(--mono);font-weight:600;font-size:23px;margin-top:5px;line-height:1.1}
+.cell .hint{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5}
+.info{display:inline-grid;place-items:center;width:14px;height:14px;border:1px solid var(--dim);border-radius:50%;font-size:9px;color:var(--dim);cursor:help;font-family:var(--mono);position:relative;flex-shrink:0}
+.info:hover{border-color:var(--cyan);color:var(--cyan)}
+.info .tip{visibility:hidden;opacity:0;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);width:230px;background:#0a1426;border:1px solid var(--cyan);border-radius:6px;padding:10px 12px;font-family:var(--thai);font-size:12px;line-height:1.6;color:var(--ink);text-align:left;z-index:30;box-shadow:0 8px 30px rgba(0,0,0,.6);transition:.15s}
+.info:hover .tip{visibility:visible;opacity:1}
+.hcell{background:rgba(8,14,28,.9);border-left:3px solid var(--mint);border-radius:0 6px 6px 0;padding:12px 14px}
+.hcell.bad{border-left-color:var(--coral)}
+.hcell .hk{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.hcell .hv{font-family:var(--mono);font-weight:600;font-size:17px;margin-top:4px}
+.hcell .ht{font-size:11px;color:var(--dim);margin-top:3px}
+.gate{margin-bottom:16px}
+.gate .gtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;gap:10px}
+.gate .gname{font-family:var(--thai);font-size:13.5px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:7px}
+.gate .gval{font-family:var(--mono);font-size:14px;font-weight:600}
+.gate .gexp{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.55}
+.track{height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.fill{height:100%;border-radius:4px;transition:width .6s ease}
+.fill.ok{background:linear-gradient(90deg,#2a8f6a,var(--mint));box-shadow:0 0 10px var(--mint)}
+.fill.vi{background:linear-gradient(90deg,#5a3a8f,var(--violet));box-shadow:0 0 10px var(--violet)}
+.reactor{display:flex;align-items:center;gap:16px}
+.ring{position:relative;width:96px;height:96px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring .rc{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .rc b{font-family:var(--mono);font-size:18px;font-weight:700;display:block}
+.ring .rc s{font-family:var(--mono);font-size:8px;color:var(--dim);text-decoration:none;letter-spacing:.1em}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:480px}
+thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;text-align:right;padding:8px 6px;font-weight:400;border-bottom:1px solid var(--line)}
+thead th:first-child{text-align:left}
+tbody td{font-family:var(--mono);text-align:right;padding:10px 6px;border-bottom:1px solid var(--line2)}
+tbody td:first-child{text-align:left;font-family:var(--thai);font-weight:600}
+.pos{color:var(--mint)}.neg{color:var(--coral)}.neu{color:var(--dim)}
+.feed{font-family:var(--mono);font-size:11.5px;max-height:230px;overflow-y:auto}
+.feed .row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
+.feed .src{flex-shrink:0;width:74px;color:var(--cyan);text-transform:uppercase;font-size:10px}
+.feed .msg{color:var(--ink);flex:1;word-break:break-word}
+.feed .ago{flex-shrink:0;color:var(--dim);font-size:10px}
+.feed .row.warn .msg{color:var(--amber)}
+.feed .row.critical .msg{color:var(--coral)}
+/* LAB specific */
+.strat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:8px}
+.strat-cell{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:6px;padding:12px 10px;text-align:center;position:relative}
+.strat-cell.best{border-color:var(--mint);box-shadow:0 0 12px rgba(77,242,176,.2)}
+.strat-cell .sn{font-size:10px;color:var(--dim);font-family:var(--mono);margin-bottom:6px}
+.strat-cell .sv{font-family:var(--mono);font-weight:600;font-size:19px}
+.strat-cell .badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--mint);color:var(--bg);font-size:9px;padding:2px 7px;border-radius:10px;font-family:var(--mono);white-space:nowrap;font-weight:600}
+.case-card{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:8px;padding:14px;margin-bottom:12px}
+.case-card .cc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.case-card .cc-sym{font-family:var(--mono);font-weight:600;font-size:16px;color:var(--cyan)}
+.case-card .cc-meta{font-size:11px;color:var(--dim);margin-top:3px}
+.case-card .cc-badge{font-size:11px;padding:3px 10px;border-radius:12px;font-family:var(--mono);font-weight:600;white-space:nowrap}
+.case-card .cc-rec{font-size:12.5px;line-height:1.7;color:var(--ink);background:rgba(255,255,255,.03);border-left:3px solid var(--violet);padding:10px 12px;border-radius:0 6px 6px 0;margin-bottom:10px}
+.case-card .cc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}
+.case-card .cs{background:rgba(63,224,255,.04);border-radius:4px;padding:7px 10px}
+.case-card .cs .ck{font-size:9.5px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em}
+.case-card .cs .cv{font-family:var(--mono);font-weight:600;font-size:14px;margin-top:3px}
+/* sparkline */
+.spark{width:100%;height:50px;display:block}
+/* manual */
+.manual h2{font-family:var(--display);font-size:15px;letter-spacing:.1em;color:var(--cyan);margin:22px 0 10px;display:flex;align-items:center;gap:9px}
+.manual h2:first-child{margin-top:0}
+.manual h2 .n{font-family:var(--mono);font-size:12px;color:var(--bg);background:var(--cyan);width:24px;height:24px;display:grid;place-items:center;border-radius:6px;box-shadow:0 0 12px var(--cyan)}
+.manual p{font-size:13.5px;line-height:1.85;color:var(--ink);margin-bottom:10px}
+.manual .muted{color:var(--dim)}
+.gloss{display:grid;gap:10px;margin:6px 0 8px}
+.gitem{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-left:3px solid var(--violet);border-radius:0 6px 6px 0;padding:11px 14px}
+.gitem .gt{font-family:var(--mono);font-size:13px;color:var(--violet);font-weight:600;margin-bottom:4px}
+.gitem .gd{font-size:12.5px;line-height:1.7;color:var(--ink)}
+.callout{background:rgba(63,224,255,.06);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:12px 0}
+.callout.warn{background:rgba(255,194,75,.07);border-color:rgba(255,194,75,.3)}
+.callout.danger{background:rgba(255,107,126,.07);border-color:rgba(255,107,126,.3)}
+.callout b{color:var(--cyan)}.callout.warn b{color:var(--amber)}.callout.danger b{color:var(--coral)}
+.checklist{list-style:none;display:grid;gap:8px;margin:8px 0}
+.checklist li{display:flex;gap:10px;font-size:13px;line-height:1.6;align-items:flex-start}
+.checklist li::before{content:'▸';color:var(--mint);flex-shrink:0}
+.hidden{display:none}
+footer{margin-top:20px;font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.06em;line-height:1.9;text-align:center}
+.loading{text-align:center;padding:24px;color:var(--dim);font-family:var(--mono);font-size:13px}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.err-banner{border-color:rgba(255,194,75,.4)!important;background:rgba(255,194,75,.06)!important}
 </style>
 </head>
 <body>
-<div class="grid-floor"></div>
-<div class="glow-orb orb1"></div>
-<div class="glow-orb orb2"></div>
-<div class="scanlines"></div>
-
+<div class="grid-floor"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div><div class="scanlines"></div>
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3FE0FF" stroke-width="1.6">
-          <path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><circle cx="12" cy="12" r="3.5" stroke="#B98CFF"/>
-        </svg>
-      </div>
-      <div>
-        <h1>PORDEE TRADING</h1>
-        <div class="sub">MISSION CONTROL · FORWARD TEST</div>
-      </div>
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#3FE0FF" stroke-width="1.6"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><circle cx="12" cy="12" r="3.5" stroke="#B98CFF"/></svg></div>
+      <div><h1>PORDEE TRADING</h1><div class="sub">MISSION CONTROL · FORWARD TEST</div></div>
     </div>
     <div class="status-cluster">
       <div class="livebadge"><span class="led" id="liveLed"></span><span id="liveTxt">CONNECTING…</span></div>
       <div class="clock" id="clock">--:--:--</div>
     </div>
   </header>
-
   <nav>
     <button class="tab active t-cy" data-tab="overview">⬡ ภาพรวมระบบ</button>
     <button class="tab t-vi" data-tab="meme">🟣 MEMEBOT</button>
     <button class="tab t-mi" data-tab="alt">🔵 ALTBOT</button>
+    <button class="tab t-or" data-tab="lab">🧪 LAB วิเคราะห์</button>
     <button class="tab t-go" data-tab="manual">📖 คู่มือ</button>
   </nav>
 
-  <!-- connection error banner -->
-  <div class="panel" id="errBanner" style="display:none;border-color:rgba(255,194,75,0.4);background:rgba(255,194,75,0.06)">
-    <span class="corner tl" style="border-color:var(--amber)"></span><span class="corner tr" style="border-color:var(--amber)"></span>
-    <span class="corner bl" style="border-color:var(--amber)"></span><span class="corner br" style="border-color:var(--amber)"></span>
+  <!-- ERROR BANNER -->
+  <div class="panel err-banner hidden" id="errBanner">
+    <span class="corner tl" style="border-color:var(--amber)"></span><span class="corner tr" style="border-color:var(--amber)"></span><span class="corner bl" style="border-color:var(--amber)"></span><span class="corner br" style="border-color:var(--amber)"></span>
     <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
-      <div style="font-size:30px;line-height:1">⚠️</div>
+      <div style="font-size:28px">⚠️</div>
       <div style="flex:1;min-width:240px">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--amber);letter-spacing:0.1em;margin-bottom:8px">เชื่อมต่อข้อมูลไม่ได้ (Failed to fetch)</div>
-        <div style="font-size:13px;line-height:1.8;color:var(--ink)">
-          ระบบฐานข้อมูลทำงานปกติ — ปัญหาคือ <b style="color:var(--amber)">"ที่ที่เปิดไฟล์นี้" บล็อกการต่อเน็ต</b><br>
-          มักเกิดเมื่อเปิดไฟล์แบบดับเบิลคลิกตรงๆ (file://) หรือเปิดในกล่องพรีวิว<br><br>
-          <b style="color:var(--cyan)">วิธีแก้:</b> เอาไฟล์นี้ขึ้นเว็บจริงก่อน (Netlify Drop ลากวาง 30 วิ) แล้วเปิดลิงก์ https ที่ได้ — จะเชื่อมได้ทันที
-        </div>
-        <button onclick="load()" style="margin-top:12px;background:var(--cyan);color:var(--bg);border:0;padding:9px 18px;border-radius:6px;font-family:var(--thai);font-weight:600;cursor:pointer">↻ ลองเชื่อมต่อใหม่</button>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--amber);margin-bottom:8px">เชื่อมต่อไม่ได้ (Failed to fetch)</div>
+        <div style="font-size:13px;line-height:1.8;color:var(--ink)">ต้องเปิดบนเว็บจริง (https) เท่านั้น — ถ้าเปิดจากไฟล์ตรงๆ จะไม่สามารถดึงข้อมูลได้<br><b style="color:var(--cyan)">วิธีแก้:</b> เปิด <b>cpyto-decgboard.vercel.app</b> แทน</div>
+        <button onclick="load()" style="margin-top:10px;background:var(--cyan);color:var(--bg);border:0;padding:8px 16px;border-radius:6px;font-family:var(--thai);font-weight:600;cursor:pointer">↻ ลองใหม่</button>
       </div>
     </div>
   </div>
 
-  <!-- ===================== OVERVIEW ===================== -->
+  <!-- OVERVIEW -->
   <section id="tab-overview">
     <div class="panel" id="killPanel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>สถานะหัวใจระบบ · SYSTEM VITALS
-        <span class="info">i<span class="tip">ทั้ง 4 ส่วนต้องเป็นสีเขียว ONLINE = ระบบทำงานครบ ถ้าตัวไหนแดง STALE แปลว่ามันหยุดส่งสัญญาณชีพ ต้องไปดูใน n8n</span></span>
-      </div>
+      <div class="ptitle"><span class="bar"></span>สถานะหัวใจระบบ · SYSTEM VITALS <span class="info">i<span class="tip">ทั้ง 4 ส่วนต้องเป็นสีเขียว ONLINE ถ้าตัวไหนแดง STALE = บอทตัวนั้นหยุดทำงาน ต้องไปดูใน n8n/Supabase</span></span></div>
       <div class="grid g4" id="healthGrid"><div class="loading">⟳ กำลังโหลด…</div></div>
     </div>
-
     <div class="grid g2">
       <div class="panel">
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-        <div class="ptitle"><span class="bar"></span>🟣 MEMEBOT · ทุนจำลอง
-          <span class="info">i<span class="tip">เงินสมมติ 100 หน่วยตอนเริ่ม ระบบบวก/ลบตามผลเหรียญที่จับได้ (หักค่าธรรมเนียม 2% แล้ว) เกิน 100 = กำไร ต่ำกว่า = ขาดทุน · ยังเป็นเงินปลอมทั้งหมด</span></span>
-        </div>
-        <div class="reactor">
-          <div class="ring" id="memeRing"></div>
-          <div>
-            <div class="cell" style="border:0;background:transparent;padding:0">
-              <div class="lab">สัญญาณที่จับได้ทั้งหมด</div>
-              <div class="val" id="memeSignals">—</div>
-              <div class="hint">เป้าหมาย 200 สัญญาณ จึงจะสรุปผลได้</div>
-            </div>
-          </div>
+        <div class="ptitle"><span class="bar"></span>🟣 MEMEBOT · ทุนจำลอง ฿10,000 <span class="info">i<span class="tip">เริ่มต้น ฿10,000 เดิมพันไม้ละ 1% ตัวเลขแสดงเป็น ฿ โดยตรง — ลดลง = ขาดทุน, เพิ่มขึ้น = กำไรจากเหรียญที่จับได้</span></span></div>
+        <div class="reactor"><div class="ring" id="memeRing"></div>
+          <div><div class="cell" style="border:0;background:transparent;padding:0">
+            <div class="lab">สัญญาณทั้งหมด</div>
+            <div class="val" id="memeSignals">—</div>
+            <div class="hint">เป้าหมาย 200 สัญญาณ จึงจะสรุปผลได้<br>price tick เก็บแล้ว: <span id="tickCount">—</span></div>
+          </div></div>
         </div>
       </div>
       <div class="panel">
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-        <div class="ptitle"><span class="bar"></span>🔵 ALTBOT · ทุนจำลอง
-          <span class="info">i<span class="tip">เงินสมมติ 100 หน่วย ระบบเทรด DOGE/SOL/ETH เฉพาะตอน BTC ขาขึ้น · ตอนนี้ BTC ขาลง ระบบจึงถือเงินสด ไม่เทรด = ปกติตามดีไซน์</span></span>
-        </div>
-        <div class="reactor">
-          <div class="ring" id="altRing"></div>
-          <div>
-            <div class="cell" style="border:0;background:transparent;padding:0">
-              <div class="lab">เทรดที่ปิดแล้ว</div>
-              <div class="val" id="altTrades">—</div>
-              <div class="hint" id="altState">—</div>
-            </div>
-          </div>
+        <div class="ptitle"><span class="bar"></span>🔵 ALTBOT · ทุนจำลอง ฿10,000 <span class="info">i<span class="tip">เทรด DOGE/SOL/ETH เฉพาะตอน BTC ขาขึ้น ตอนนี้ BTC ขาลงจึงถือเงินสด = ปกติ</span></span></div>
+        <div class="reactor"><div class="ring" id="altRing"></div>
+          <div><div class="cell" style="border:0;background:transparent;padding:0">
+            <div class="lab">เทรดปิดแล้ว</div>
+            <div class="val" id="altTrades">—</div>
+            <div class="hint" id="altState">—</div>
+          </div></div>
         </div>
       </div>
     </div>
-
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>บันทึกการทำงานสด · LIVE TELEMETRY
-        <span class="info">i<span class="tip">ทุกครั้งที่บอททำงาน มันจะส่งข้อความมาที่นี่ (เรียกว่า heartbeat) ดูได้ว่าระบบยังหายใจอยู่ทุกกี่นาที</span></span>
-      </div>
-      <div class="feed" id="feed"><div class="loading">⟳ กำลังโหลด…</div></div>
+      <div class="ptitle"><span class="bar"></span>บันทึกสด · LIVE TELEMETRY</div>
+      <div class="feed" id="feed"><div class="loading">⟳</div></div>
     </div>
   </section>
 
-  <!-- ===================== MEMEBOT ===================== -->
+  <!-- MEMEBOT -->
   <section id="tab-meme" class="hidden">
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>AIRLOCK v2 · ประตูนิรภัยก่อนใช้เงินจริง
-        <span class="info">i<span class="tip">AIRLOCK = ประตูกันคนเข้า-ออกยานอวกาศ ต้องผ่านครบทุกข้อก่อน ถึงจะพิจารณาเอาเงินจริงมาเล่น · ห้ามแอบปรับเกณฑ์ระหว่างทดสอบเด็ดขาด</span></span>
-      </div>
-      <p style="font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px">
-        แถบทั้ง 4 ต้องเต็มและขึ้นสีเขียว ✓ พร้อมกันทั้งหมด ระบบถึงจะ "ผ่าน" — ตอนนี้กำลังเก็บข้อมูล ยังไม่ต้องลุ้นตัวเลข
-      </p>
-      <div id="memeGates"><div class="loading">⟳ กำลังโหลด…</div></div>
+      <div class="ptitle"><span class="bar"></span>AIRLOCK v2 · ประตูนิรภัยก่อนใช้เงินจริง</div>
+      <p style="font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px">แถบทั้ง 4 ต้องขึ้นสีเขียวพร้อมกัน — ตอนนี้กำลังเก็บข้อมูล</p>
+      <div id="memeGates"><div class="loading">⟳</div></div>
     </div>
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>สัญญาณเหรียญล่าสุด · SIGNAL LOG
-        <span class="info">i<span class="tip">เหรียญใหม่บน Solana ที่ผ่านเกณฑ์ (อายุ 1-12 ชม. สภาพคล่อง>$30k ราคาขึ้นใน 1 ชม.) ระบบจดไว้วัดผลที่ 1/6/24 ชม. ยังไม่ได้ซื้อจริง</span></span>
-      </div>
-      <div class="tbl-wrap"><table id="memeTable"><thead><tr>
-        <th>เหรียญ</th><th>เวลาจับ</th><th>สภาพคล่อง</th><th>ขึ้น 1ชม.</th><th>สถานะ</th>
-      </tr></thead><tbody><tr><td colspan="5" class="loading">⟳ กำลังโหลด…</td></tr></tbody></table></div>
+      <div class="ptitle"><span class="bar"></span>สัญญาณล่าสุด · SIGNAL LOG</div>
+      <div class="tbl-wrap"><table id="memeTable"><thead><tr><th>เหรียญ</th><th>เวลาจับ</th><th>Liq</th><th>พุ่งตอนเจอ</th><th>h1</th><th>สถานะ</th></tr></thead><tbody><tr><td colspan="6" class="loading">⟳</td></tr></tbody></table></div>
     </div>
   </section>
 
-  <!-- ===================== ALTBOT ===================== -->
+  <!-- ALTBOT -->
   <section id="tab-alt" class="hidden">
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>เกณฑ์ผ่าน ALTBOT · GATE STATUS
-        <span class="info">i<span class="tip">ต้องเทรดครบ 100 ไม้ และทำกำไรแบบ PF≥1.25 (กำไรรวมมากกว่าขาดทุนรวม 1.25 เท่า) จึงจะผ่าน</span></span>
-      </div>
-      <div class="grid g4" id="altStats"><div class="loading">⟳ กำลังโหลด…</div></div>
-      <div class="callout" id="altWhy" style="margin-top:16px"></div>
+      <div class="ptitle"><span class="bar"></span>เกณฑ์ผ่าน · GATE STATUS</div>
+      <div class="grid g4" id="altStats"><div class="loading">⟳</div></div>
+      <div class="callout warn" id="altWhy" style="margin-top:16px"></div>
     </div>
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="ptitle"><span class="bar"></span>บันทึกการเทรด · TRADE LOG
-        <span class="info">i<span class="tip">ทุกไม้ที่ AltBot เปิด/ปิด จะบันทึกที่นี่ พร้อมกำไร-ขาดทุน % และเหตุผลที่ปิด</span></span>
-      </div>
-      <div class="tbl-wrap"><table id="altTable"><thead><tr>
-        <th>เหรียญ</th><th>เวลาเข้า</th><th>ราคาเข้า</th><th>กำไร/ขาดทุน</th><th>เหตุผลปิด</th><th>สถานะ</th>
-      </tr></thead><tbody><tr><td colspan="6" class="loading">⟳ กำลังโหลด…</td></tr></tbody></table></div>
+      <div class="ptitle"><span class="bar"></span>บันทึกเทรด · TRADE LOG</div>
+      <div class="tbl-wrap"><table id="altTable"><thead><tr><th>เหรียญ</th><th>เวลาเข้า</th><th>ราคาเข้า</th><th>กำไร/ขาดทุน</th><th>เหตุผลปิด</th><th>สถานะ</th></tr></thead><tbody><tr><td colspan="6" class="loading">⟳</td></tr></tbody></table></div>
     </div>
   </section>
 
-  <!-- ===================== MANUAL ===================== -->
+  <!-- LAB -->
+  <section id="tab-lab" class="hidden">
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="ptitle"><span class="bar"></span>🧪 เปรียบเทียบกลยุทธ์ออก · EXIT STRATEGY LAB
+        <span class="info">i<span class="tip">จำลอง 7 วิธีออกจากราคาจริงทุก 2 นาที ตัวที่ขึ้นสีเขียวคือกลยุทธ์ที่เฉลี่ยให้กำไรสูงสุดจากข้อมูลที่มี (path สมบูรณ์เท่านั้น)</span></span>
+      </div>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.6">เหรียญที่มี price path สมบูรณ์ (เก็บตั้งแต่นาทีแรก) เท่านั้นที่นับ — เหรียญใหม่ทุกตัวตั้งแต่เปิดระบบจะมี path ครบ อีก 1-2 สัปดาห์ข้อมูลจะพอสรุปได้</p>
+      <div id="stratGrid"><div class="loading">⟳ กำลังโหลด…</div></div>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="ptitle"><span class="bar"></span>จังหวะเข้าที่ดีที่สุด · ENTRY TIMING LAB
+        <span class="info">i<span class="tip">เปรียบเทียบว่าเข้าตอนเหรียญพุ่งไปแล้วกี่%ให้ผลดีที่สุด จากข้อมูลจริงที่เก็บมา</span></span>
+      </div>
+      <div id="entryGrid"><div class="loading">⟳</div></div>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="ptitle"><span class="bar"></span>กรณีศึกษา รายเหรียญ · CASE STUDY LOG
+        <span class="info">i<span class="tip">ทุกเหรียญที่ระบบจับได้ มีบันทึกพฤติกรรมราคา + คำแนะนำอัตโนมัติ + ผลเปรียบเทียบถ้าออกแต่ละเวลา เก็บสะสมเป็นฐานข้อมูลสำหรับออกแบบ MemeBot v2</span></span>
+      </div>
+      <div id="caseCards"><div class="loading">⟳</div></div>
+    </div>
+  </section>
+
+  <!-- MANUAL -->
   <section id="tab-manual" class="hidden">
     <div class="panel manual">
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-
       <h2><span class="n">1</span>ระบบนี้คืออะไร</h2>
-      <p>นี่คือหน้าจอเฝ้าดูบอทเทรดคริปโต 2 ตัวที่ทำงานอัตโนมัติบนเซิร์ฟเวอร์ตลอด 24 ชม. <b>ทั้งคู่ยังเล่นด้วยเงินปลอม (paper trading)</b> เพื่อพิสูจน์ว่ากลยุทธ์ใช้ได้จริงก่อนเสี่ยงเงินจริง</p>
+      <p>บอทเทรดคริปโต 2 ตัวที่รันอัตโนมัติบน Supabase (ฟรีตลอด ไม่หลับ) <b>ทั้งคู่ยังเล่นด้วยเงินปลอม</b> เพื่อพิสูจน์กลยุทธ์ก่อนเสี่ยงเงินจริง</p>
       <div class="gloss">
-        <div class="gitem"><div class="gt">🟣 MemeBot</div><div class="gd">คอยส่องเหรียญใหม่บน Solana ที่เพิ่งเกิด (อายุ 1-12 ชม.) แล้วจดไว้ดูว่าถ้า "ซื้อ" ตอนนั้นจะกำไรหรือเจ๊งที่ 1, 6, 24 ชม. — เป็นการทดสอบว่าจับเหรียญใหม่ทำเงินได้ไหม</div></div>
-        <div class="gitem"><div class="gt">🔵 AltBot</div><div class="gd">เทรด DOGE / SOL / ETH ด้วยกลยุทธ์ "ตามโมเมนตัม" แต่จะเทรดเฉพาะตอน Bitcoin เป็นขาขึ้นเท่านั้น ถ้า BTC ขาลงจะถือเงินสดเฉยๆ ไม่เสี่ยง</div></div>
+        <div class="gitem"><div class="gt">🟣 MemeBot</div><div class="gd">ส่องเหรียญใหม่บน Solana (อายุ 1-12 ชม.) เก็บราคาทุก 2 นาที วิเคราะห์ว่าถ้าเข้า/ออกเวลาต่างๆ จะได้ผลยังไง เป้าหมาย 200 สัญญาณ</div></div>
+        <div class="gitem"><div class="gt">🔵 AltBot</div><div class="gd">เทรด DOGE/SOL/ETH เฉพาะตอน BTC ขาขึ้น ถ้า BTC ขาลงถือเงินสด = ปกติตามดีไซน์</div></div>
+        <div class="gitem"><div class="gt">🧪 LAB</div><div class="gd">ห้องแล็บวิเคราะห์: เปรียบเทียบ 7 กลยุทธ์ออกจากราคาจริง + case study รายเหรียญ ใช้ออกแบบ MemeBot v2</div></div>
       </div>
-
-      <h2><span class="n">2</span>ตอนนี้ระบบกำลังทำอะไร</h2>
-      <p id="manualNow" class="muted">กำลังโหลดสถานะ…</p>
-
-      <h2><span class="n">3</span>ตัวเลขแต่ละตัวแปลว่าอะไร</h2>
+      <h2><span class="n">2</span>ตัวเลขแต่ละตัวแปลว่าอะไร</h2>
       <div class="gloss">
-        <div class="gitem"><div class="gt">สัญญาณ (Signal)</div><div class="gd">เหรียญใหม่ที่ผ่านเกณฑ์และถูกจดไว้ดูผล 1 สัญญาณ = 1 ครั้งที่เจอเหรียญน่าสนใจ ยังไม่ได้ซื้อจริง</div></div>
-        <div class="gitem"><div class="gt">ทุนจำลอง (Equity)</div><div class="gd">เงินสมมติเริ่มต้นที่ 100 หน่วย ระบบบวก/ลบตามผลเทรด · 147 = กำไร 47%, 88 = ขาดทุน 12%</div></div>
-        <div class="gitem"><div class="gt">PF (Profit Factor)</div><div class="gd">กำไรรวม ÷ ขาดทุนรวม · มากกว่า 1 = โดยรวมกำไร · เราต้องการ ≥ 1.25 (กำไรชนะขาดทุน 25%+) ถึงจะถือว่าดีพอ</div></div>
-        <div class="gitem"><div class="gt">Win Rate (อัตราชนะ)</div><div class="gd">% ของไม้ที่กำไร · ระบบนี้ชนะแค่ ~30% แต่ยังกำไรได้เพราะไม้ที่ชนะ "ชนะใหญ่" — เป็นเรื่องปกติของกลยุทธ์ตามเทรนด์ อย่าตกใจถ้าเห็นเลขต่ำ</div></div>
-        <div class="gitem"><div class="gt">net_avg (กำไรเฉลี่ยสุทธิ)</div><div class="gd">กำไรเฉลี่ยต่อ 1 สัญญาณ หลังหักค่าธรรมเนียม 2% แล้ว · ต้องเป็นบวก</div></div>
-        <div class="gitem"><div class="gt">heartbeat (สัญญาณชีพ)</div><div class="gd">ข้อความที่บอทส่งมาทุกครั้งที่ทำงาน บอกว่า "ฉันยังไม่ตาย" · ถ้าเงียบนานเกินไป = บอทมีปัญหา</div></div>
-        <div class="gitem"><div class="gt">btc_bull</div><div class="gd">true = Bitcoin ขาขึ้น (AltBot เทรดได้) · false = ขาลง (AltBot ถือเงินสด)</div></div>
-        <div class="gitem"><div class="gt">api_error vs rug</div><div class="gd">api_error = ดึงข้อมูลไม่ได้ชั่วคราว (เน็ตล่ม ไม่นับเป็นขาดทุน) · rug = เหรียญหนีหาย/scam จริง · เราแยกสองอันนี้ออกจากกันเพื่อไม่ให้ผลเพี้ยน</div></div>
+        <div class="gitem"><div class="gt">ทุนจำลอง ฿10,000</div><div class="gd">เดิมพันไม้ละ 1% ฿10,000 = 100 หน่วย ฿9,800 = ขาดทุน 2% (฿200) ฿10,300 = กำไร 3% (฿300)</div></div>
+        <div class="gitem"><div class="gt">Exit Strategy (กลยุทธ์ออก)</div><div class="gd">จำลองจากราคาจริงทุก 2 นาที — "ขายที่ 30 นาที -5%" = ถ้าขายทุกเหรียญที่ 30 นาทีหลังจับ เฉลี่ยเสีย 5% ต่อไม้</div></div>
+        <div class="gitem"><div class="gt">Trailing Stop</div><div class="gd">ขายอัตโนมัติเมื่อราคาร่วงจากจุดสูงสุดตามที่กำหนด เช่น trailing -15% = ถ้าเด้ง +50% แล้วร่วง 15% = ขายที่ +35%</div></div>
+        <div class="gitem"><div class="gt">path สมบูรณ์</div><div class="gd">เหรียญที่ระบบเก็บราคาตั้งแต่นาทีแรกหลังจับสัญญาณ ใช้อ้างอิงได้จริง (⚠️ = เก็บกลางทาง อ้างอิงไม่ได้)</div></div>
+        <div class="gitem"><div class="gt">พีค (Peak)</div><div class="gd">ราคาสูงสุดที่วัดได้ หลังจากเราจับสัญญาณ พีค +200% ที่นาที 15 = เหรียญขึ้น 200% ภายใน 15 นาทีแรก</div></div>
       </div>
-
-      <h2><span class="n">4</span>ฉันต้องทำอะไรบ้าง</h2>
-      <div class="callout"><b>ตอบสั้นๆ: ไม่ต้องทำอะไรเลย</b> — ระบบทำงานเอง หน้าที่ของคุณคือแค่เปิดมาดูเป็นครั้งคราวว่ายังเขียว ONLINE อยู่ไหม</div>
+      <h2><span class="n">3</span>ฉันต้องทำอะไรบ้าง</h2>
+      <div class="callout"><b>ตอบสั้นๆ: ไม่ต้องทำอะไรเลย</b> — ระบบทำงานเองทุก 2 นาที เปิดดูแท็บ LAB สัปดาห์ละครั้งพอ</div>
       <ul class="checklist">
-        <li>เปิดดูสัปดาห์ละ 1-2 ครั้งก็พอ ว่าหัวใจระบบยังเขียวครบ 4 ดวง</li>
-        <li>ห้ามปรับแต่งอะไรในกลยุทธ์ระหว่างทดสอบ — เห็นตัวเลขสวยหรือไม่สวยก็ปล่อยให้ครบเป้าก่อน (กฎเหล็ก)</li>
-        <li>รอจนกว่า MemeBot ครบ 200 สัญญาณ หรือ AltBot ครบ 100 เทรด แล้วค่อยกลับมาสรุปผลด้วยกัน</li>
+        <li>เปิดดูแท็บ LAB เพื่อดูว่ากลยุทธ์ออกแบบไหนเฉลี่ยดีที่สุด</li>
+        <li>ห้ามปรับแต่งกลยุทธ์ระหว่างทดสอบ — รอครบ 200 สัญญาณก่อน</li>
+        <li>เมื่อมี case study ครบ ค่อยมาออกแบบ MemeBot v2 ด้วยกัน</li>
       </ul>
-
-      <h2><span class="n">5</span>เมื่อไหร่ถึงจะใช้เงินจริง</h2>
-      <p>ต่อเมื่อผ่าน AIRLOCK ครบทุกข้อ (ดูแท็บ MemeBot) <b>และ</b> AltBot ทำ PF ≥ 1.25 ครบ 100 เทรด เท่านั้น ถ้าผ่าน เราจะเริ่มด้วยเงินก้อนเล็กและความเสี่ยงแค่ 1% ต่อไม้</p>
-      <div class="callout danger"><b>⚠ เตือนเรื่องเงินทุน:</b> ถ้าถึงวันใช้เงินจริง ต้องมีทุนขั้นต่ำ $2,000 (เหมาะสุดคือ $10,000+) · ทุนเล็กกว่านี้ความเสี่ยงจริงต่อไม้จะสูงเกินคุม และอาจขาดทุนหนัก 30-50% ได้</div>
-
-      <h2><span class="n">6</span>ถ้าเห็นสีแดงหรือคำเตือน ทำยังไง</h2>
-      <ul class="checklist">
-        <li><b>หัวใจระบบดวงใดดวงหนึ่งเป็นแดง STALE:</b> บอทตัวนั้นหยุดทำงาน → เปิด n8n ดูว่า workflow ยัง Active อยู่ไหม</li>
-        <li><b>Kill Switch ขึ้น ACTIVE 🛑:</b> ระบบหยุดตัวเองเพื่อความปลอดภัย (เช่นตลาดพังแรง) → ปกติ ปล่อยไว้จนตลาดนิ่งแล้วค่อยปิดสวิตช์</li>
-        <li><b>เห็น critical สีแดงในบันทึกสด:</b> มี error ร้ายแรง → เปิดดูรายละเอียดใน n8n Executions</li>
-      </ul>
-      <p class="muted" style="margin-top:14px">รายละเอียดการกู้ระบบฉบับเต็มอยู่ในไฟล์ INCIDENT_RUNBOOK_TH.md ที่ส่งให้ก่อนหน้า</p>
+      <h2><span class="n">4</span>เมื่อไหร่ถึงจะใช้เงินจริง</h2>
+      <div class="callout danger"><b>⚠ ทุนขั้นต่ำ $2,000 (เหมาะสุด $10,000+)</b> · ต้องรอผ่าน AIRLOCK ครบทุกข้อก่อน · ต่อให้ผ่านแล้วก็เริ่มเล็กเสมอ — ไม่รีบ</div>
     </div>
   </section>
 
-  <footer>
-    PAPER TRADING ONLY · ข้อมูลสดจาก SUPABASE · รีเฟรชอัตโนมัติทุก 2 นาที<br>
-    ตามกติกา FORWARD_TEST_RULEBOOK v1.0 — ห้ามปรับแต่งกลยุทธ์ระหว่างทดสอบ
-  </footer>
+  <footer>PAPER TRADING ONLY · ข้อมูลสดจาก SUPABASE · เก็บ tick ทุก 2 นาที · case study อัปเดตทุก 30 นาที<br>ตามกติกา FORWARD_TEST_RULEBOOK v1.0 — ห้ามปรับแต่งกลยุทธ์ระหว่างทดสอบ</footer>
 </div>
 
 <script>
-// ===================== CONFIG =====================
-const SUPA_URL = "https://fkhykyfgykguvpelmdsf.supabase.co";
-const ANON_KEY = "sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA";
-const H = { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY };
+const SUPA_URL="https://fkhykyfgykguvpelmdsf.supabase.co";
+const ANON_KEY="sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA";
+const H={apikey:ANON_KEY,Authorization:"Bearer "+ANON_KEY};
+const $=s=>document.querySelector(s);
+const fmt=(n,d=1)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("th-TH",{maximumFractionDigits:d});
+const fmtB=n=>n==null?"—":"฿"+Math.round(n*100).toLocaleString("th-TH");
+const pct=n=>n==null?"—":(n>0?"+":"")+fmt(n)+"%";
+const hrsAgo=t=>t?(Date.now()-new Date(t))/3600000:null;
+const minsAgo=t=>t?Math.round((Date.now()-new Date(t))/60000):null;
+async function get(p){const r=await fetch(SUPA_URL+"/rest/v1/"+p,{headers:H});if(!r.ok)throw new Error("HTTP "+r.status);const t=await r.text();return t?JSON.parse(t):[];}
 
-// ===================== HELPERS =====================
-const $ = s => document.querySelector(s);
-const fmt = (n,d=1) => n==null||isNaN(n) ? "—" : Number(n).toLocaleString("th-TH",{maximumFractionDigits:d});
-const pct = n => n==null||isNaN(n) ? "—" : (n>0?"+":"")+fmt(n)+"%";
-const hrsAgo = t => t ? (Date.now()-new Date(t))/3600000 : null;
-const minsAgo = t => t ? Math.round((Date.now()-new Date(t))/60000) : null;
-async function get(path){
-  const r = await fetch(SUPA_URL+"/rest/v1/"+path,{headers:H});
-  if(!r.ok) throw new Error("HTTP "+r.status+" @ "+path.split("?")[0]);
-  return r.json();
+function ring(el,val100,color,label){
+  const r=42,c=2*Math.PI*r;
+  const prog=Math.max(0.01,Math.min(1,(val100-50)/100));
+  const col=val100>=100?"#4DF2B0":(val100>=85?color:"#FF6B7E");
+  el.innerHTML=`<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-prog)}" style="filter:drop-shadow(0 0 6px ${col})"/></svg><div class="rc"><b style="color:${col}">${fmtB(val100*100)}</b><s>${label||"EQUITY"}</s></div>`;
 }
 
-// ring gauge
-function ring(el, value, color){
-  const base=100, v=value??100, off=Math.max(0,Math.min(100,((v-50)/100)*100));
-  const r=42, c=2*Math.PI*r, prog=Math.max(0.02,Math.min(1,(v-50)/100));
-  const col = v>=100?"#4DF2B0":(v>=85?color:"#FF6B7E");
-  el.innerHTML = `<svg width="96" height="96" viewBox="0 0 96 96">
-    <circle cx="48" cy="48" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
-    <circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round"
-      stroke-dasharray="${c}" stroke-dashoffset="${c*(1-prog)}" style="filter:drop-shadow(0 0 6px ${col})"/>
-  </svg><div class="rc"><b style="color:${col}">${fmt(v)}</b><s>EQUITY</s></div>`;
-}
-
-// ===================== RENDER =====================
-let firstLoad = true;
 async function load(){
   try{
-    const [signals, outcomes, alt, healthArr, quality, events] = await Promise.all([
+    const[signals,outcomes,alt,healthArr,quality,events,ticks,caseLog,stratLab,entryLab]=await Promise.all([
       get("meme_signals?select=*&order=scanned_at.desc&limit=300"),
       get("meme_outcomes?select=*&limit=3000"),
       get("alt_trades?select=*&order=opened_at.desc&limit=200"),
       get("system_health?select=*"),
       get("meme_data_quality?select=*"),
       get("system_events?select=*&order=created_at.desc&limit=18"),
+      get("meme_price_ticks?select=id&limit=1"),
+      get("meme_case_log?select=*&order=scanned_at.desc&limit=30"),
+      get("exit_strategy_lab?select=*"),
+      get("entry_timing_lab?select=*"),
     ]);
-    const health = healthArr[0]||{};
+    const health=healthArr[0]||{};
+
+    // get total ticks count separately
+    const tickCount=await fetch(SUPA_URL+"/rest/v1/meme_price_ticks?select=id",{headers:{...H,"Prefer":"count=exact","Range":"0-0"}}).then(r=>r.headers.get("content-range")?.split("/")[1]||"?");
+
     renderHealth(health);
-    renderMeme(signals, outcomes, quality);
-    renderAlt(alt, health);
+    renderMeme(signals,outcomes,quality,tickCount);
+    renderAlt(alt,health);
     renderFeed(events);
-    renderManualNow(health, signals, alt);
+    renderLab(caseLog,stratLab,entryLab);
     setLive(true);
-    firstLoad=false;
-  }catch(e){
-    setLive(false, e.message);
-  }
+  }catch(e){setLive(false,e.message);}
 }
 
-function setLive(ok, err){
-  const led=$("#liveLed"), txt=$("#liveTxt");
-  const banner=$("#errBanner");
-  if(ok){
-    led.className="led on"; txt.textContent="LIVE · "+new Date().toLocaleTimeString("th-TH");
-    if(banner) banner.style.display="none";
-  } else {
-    led.className="led off"; txt.textContent="OFFLINE";
-    if(err) console.error(err);
-    if(banner) banner.style.display="block";
-  }
+function setLive(ok,err){
+  const led=$("#liveLed"),txt=$("#liveTxt"),bn=$("#errBanner");
+  if(ok){led.className="led on";txt.textContent="LIVE · "+new Date().toLocaleTimeString("th-TH");bn.classList.add("hidden");}
+  else{led.className="led off";txt.textContent="OFFLINE";bn.classList.remove("hidden");if(err)console.error(err);}
 }
 
 function renderHealth(h){
-  const rows=[
-    {k:"SCANNER 🟣",t:h.last_scan,lim:2.5},
-    {k:"OUTCOME 🟣",t:h.last_outcome,lim:1.5},
-    {k:"ALTBOT 🔵",t:h.last_altbot,lim:5},
-  ];
-  let html = rows.map(r=>{
-    const hr=hrsAgo(r.t), ok=hr!=null && hr<r.lim;
-    return `<div class="hcell ${ok?'':'bad'}">
-      <div class="hk">${r.k}</div>
-      <div class="hv" style="color:${ok?'var(--mint)':'var(--coral)'}">${ok?'ONLINE':'STALE'}</div>
-      <div class="ht">${hr==null?'ไม่มีข้อมูล':'อัปเดต '+fmt(hr*60,0)+' นาทีก่อน'}</div>
-    </div>`;
-  }).join("");
-  const ks=h.kill_switch;
-  html += `<div class="hcell ${ks?'bad':''}">
-    <div class="hk">KILL SWITCH</div>
-    <div class="hv" style="color:${ks?'var(--coral)':'var(--mint)'}">${ks?'ACTIVE 🛑':'ปิดอยู่'}</div>
-    <div class="ht">error ร้ายแรง 24ชม.: ${h.critical_24h??0}</div>
-  </div>`;
-  $("#healthGrid").innerHTML = html;
+  const rows=[{k:"SCANNER 🟣",t:h.last_scan,lim:2.5},{k:"OUTCOME 🟣",t:h.last_outcome,lim:1.5},{k:"ALTBOT 🔵",t:h.last_altbot,lim:5}];
+  let html=rows.map(r=>{const hr=hrsAgo(r.t),ok=hr!=null&&hr<r.lim;return`<div class="hcell ${ok?'':'bad'}"><div class="hk">${r.k}</div><div class="hv" style="color:${ok?'var(--mint)':'var(--coral)'}">${ok?'ONLINE':'STALE'}</div><div class="ht">${hr==null?'ไม่มีข้อมูล':fmt(hr*60,0)+' นาทีก่อน'}</div></div>`;}).join('');
+  html+=`<div class="hcell ${h.kill_switch?'bad':''}"><div class="hk">KILL SWITCH</div><div class="hv" style="color:${h.kill_switch?'var(--coral)':'var(--mint)'}">${h.kill_switch?'ACTIVE 🛑':'ปิดอยู่'}</div><div class="ht">critical 24ชม.: ${h.critical_24h||0}</div></div>`;
+  $("#healthGrid").innerHTML=html;
 }
 
-function renderMeme(signals, outcomes, quality){
-  const ok = outcomes.filter(o=>(o.measure_status||'measured')==='measured');
-  const h1 = ok.filter(o=>o.horizon==='h1' && o.pnl_pct!=null).map(o=>o.pnl_pct).sort((a,b)=>a-b);
-  const win = h1.length ? h1.filter(p=>p>0).length/h1.length*100 : null;
-  const netAvg = h1.length ? h1.reduce((s,x)=>s+x,0)/h1.length - 2 : null;
-  const median = h1.length ? h1[Math.floor(h1.length/2)] : null;
-  let eq=100; ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).forEach(o=>eq+=(o.pnl_pct-2)/100);
-  const totQ = quality.reduce((s,q)=>s+q.n,0);
-  const badQ = quality.filter(q=>q.measure_status!=='measured').reduce((s,q)=>s+q.n,0);
-  const apiErrPct = totQ? badQ/totQ*100 : 0;
+function renderMeme(signals,outcomes,quality,tickCount){
+  const ok=outcomes.filter(o=>(o.measure_status||'measured')==='measured');
+  const h1=ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).map(o=>o.pnl_pct).sort((a,b)=>a-b);
+  const win=h1.length?h1.filter(p=>p>0).length/h1.length*100:null;
+  const netAvg=h1.length?h1.reduce((s,x)=>s+x,0)/h1.length-2:null;
+  const median=h1.length?h1[Math.floor(h1.length/2)]:null;
+  let eq=100;ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).forEach(o=>eq+=(o.pnl_pct-2)/100);
+  const totQ=quality.reduce((s,q)=>s+q.n,0);
+  const badQ=quality.filter(q=>q.measure_status!=='measured').reduce((s,q)=>s+q.n,0);
+  const apiErrPct=totQ?badQ/totQ*100:0;
 
-  $("#memeSignals").textContent = signals.length;
-  ring($("#memeRing"), eq, "#B98CFF");
+  $("#memeSignals").textContent=signals.length;
+  $("#tickCount").textContent=tickCount;
+  ring($("#memeRing"),eq,"#B98CFF");
 
   const gates=[
-    {name:"จำนวนสัญญาณ ≥ 200", val:signals.length+" / 200", prog:Math.min(100,signals.length/2),
-     ok:signals.length>=200, exp:"ต้องเก็บสัญญาณให้ครบ 200 ครั้งก่อน ตัวเลขผลถึงจะน่าเชื่อถือ (ตอนนี้เพิ่งเริ่มนับ)"},
-    {name:"อัตราชนะ 1 ชม. > 55%", val:win==null?"ยังไม่มีข้อมูล":fmt(win,0)+"%", prog:Math.min(100,(win||0)/55*100),
-     ok:win>55, exp:"% ของเหรียญที่ราคาขึ้นหลังจับได้ 1 ชม. · ต้องเกินครึ่ง"},
-    {name:"กำไรเฉลี่ยสุทธิ & ค่ากลาง > 0", val:netAvg==null?"ยังไม่มีข้อมูล":pct(netAvg)+" / กลาง "+pct(median), prog:netAvg==null?0:Math.min(100,Math.max(0,50+netAvg*5)),
-     ok:netAvg>0&&median>0, exp:"กำไรเฉลี่ยต่อสัญญาณหลังหักค่าธรรมเนียม 2% ต้องเป็นบวกทั้งค่าเฉลี่ยและค่ากลาง"},
-    {name:"ข้อมูลพลาด < 10%", val:fmt(apiErrPct,0)+"% พลาด", prog:Math.max(0,100-apiErrPct*10),
-     ok:apiErrPct<10, exp:"% ของการวัดผลที่ดึงข้อมูลไม่ได้ · ถ้าสูงเกินไปแปลว่าระบบเก็บข้อมูลมีปัญหา ผลจะเชื่อไม่ได้"},
+    {name:"จำนวนสัญญาณ ≥ 200",val:signals.length+" / 200",prog:Math.min(100,signals.length/2),ok:signals.length>=200,exp:"ต้องเก็บสัญญาณครบ 200 ครั้งก่อน ตัวเลขถึงจะน่าเชื่อถือ"},
+    {name:"อัตราชนะ 1 ชม. > 55%",val:win==null?"ยังไม่มี":fmt(win,0)+"%",prog:Math.min(100,(win||0)/55*100),ok:win>55,exp:"% เหรียญที่ราคาขึ้นใน 1 ชม.หลังจับ"},
+    {name:"กำไรเฉลี่ยสุทธิ & ค่ากลาง > 0",val:netAvg==null?"ยังไม่มี":pct(netAvg)+" / กลาง "+pct(median),prog:netAvg==null?0:Math.min(100,Math.max(0,50+netAvg*5)),ok:netAvg>0&&median>0,exp:"หลังหักค่าธรรมเนียม 2% แล้ว"},
+    {name:"ข้อมูลพลาด < 10%",val:fmt(apiErrPct,0)+"% error",prog:Math.max(0,100-apiErrPct*10),ok:apiErrPct<10,exp:"ถ้าเกิน 10% = infra มีปัญหา ผลสรุปใช้ไม่ได้"},
   ];
-  $("#memeGates").innerHTML = gates.map(g=>`
-    <div class="gate">
-      <div class="gtop">
-        <div class="gname">${g.ok?'✓ ':''}${g.name}</div>
-        <div class="gval" style="color:${g.ok?'var(--mint)':'var(--amber)'}">${g.val}</div>
-      </div>
-      <div class="track"><div class="fill ${g.ok?'ok':'vi'}" style="width:${g.prog}%"></div></div>
-      <div class="gexp">${g.exp}</div>
-    </div>`).join("");
+  $("#memeGates").innerHTML=gates.map(g=>`<div class="gate"><div class="gtop"><div class="gname">${g.ok?'✓ ':''} ${g.name}</div><div class="gval" style="color:${g.ok?'var(--mint)':'var(--amber)'}">${g.val}</div></div><div class="track"><div class="fill ${g.ok?'ok':'vi'}" style="width:${g.prog}%"></div></div><div class="gexp">${g.exp}</div></div>`).join('');
 
-  const tb = $("#memeTable").querySelector("tbody");
-  if(!signals.length){ tb.innerHTML=`<tr><td colspan="5" class="neu" style="text-align:center;padding:16px">ยังไม่มีสัญญาณ</td></tr>`; return; }
-  tb.innerHTML = signals.slice(0,15).map(s=>`<tr>
-    <td>${s.symbol||'?'}</td>
-    <td class="neu">${new Date(s.scanned_at).toLocaleString("th-TH",{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
-    <td>$${fmt(s.liquidity_usd,0)}</td>
-    <td class="${(s.price_change_h1||0)>0?'pos':'neg'}">${pct(s.price_change_h1)}</td>
-    <td class="neu" style="font-size:11px">${s.status==='open'?'กำลังติดตาม':'ปิดแล้ว'}</td>
-  </tr>`).join("");
+  const tb=$("#memeTable").querySelector("tbody");
+  if(!signals.length){tb.innerHTML=`<tr><td colspan="6" class="neu" style="text-align:center;padding:16px">ยังไม่มีสัญญาณ</td></tr>`;return;}
+  const outcomeMap={};outcomes.forEach(o=>{if(!outcomeMap[o.signal_id])outcomeMap[o.signal_id]={};outcomeMap[o.signal_id][o.horizon]=o.pnl_pct;});
+  tb.innerHTML=signals.slice(0,15).map(s=>{const p1=outcomeMap[s.id]?.h1;return`<tr><td>${s.symbol||'?'}</td><td class="neu">${new Date(s.scanned_at).toLocaleString("th-TH",{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>$${fmt(s.liquidity_usd,0)}</td><td class="${(s.price_change_h1||0)>30?'neg':'pos'}">${pct(s.price_change_h1)}</td><td class="${p1==null?'neu':p1>0?'pos':'neg'}">${p1==null?'—':pct(p1)}</td><td class="neu" style="font-size:11px">${s.status==='open'?'ติดตาม':'ปิด'}</td></tr>`;}).join('');
 }
 
-function renderAlt(alt, health){
-  const closed = alt.filter(t=>t.status==='closed'&&t.pnl_pct!=null);
-  const open = alt.filter(t=>t.status==='open');
-  const win = closed.length ? closed.filter(t=>t.pnl_pct>0).length/closed.length*100 : null;
-  const wins = closed.filter(t=>t.pnl_pct>0).reduce((s,t)=>s+t.pnl_pct,0);
-  const loss = Math.abs(closed.filter(t=>t.pnl_pct<=0).reduce((s,t)=>s+t.pnl_pct,0));
-  const pf = loss>0 ? wins/loss : (wins>0?9:null);
-  let eq=100; [...closed].sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at)).forEach(t=>eq*=1+t.pnl_pct/100);
-
-  $("#altTrades").textContent = closed.length;
-  ring($("#altRing"), eq, "#3FE0FF");
-  const btcBull = (health.last_altbot && false); // placeholder, real state from event
-  $("#altState").textContent = open.length+" ไม้ที่ถืออยู่ · เป้าหมาย 100 เทรด";
-
-  $("#altStats").innerHTML = [
-    ["เทรดปิดแล้ว", closed.length+" / 100", "var(--ink)"],
-    ["อัตราชนะ", win==null?"—":fmt(win,0)+"%", "var(--ink)"],
-    ["PROFIT FACTOR", pf==null?"—":fmt(pf,2), pf>=1.25?"var(--mint)":"var(--amber)"],
-    ["ถืออยู่ตอนนี้", open.length, "var(--amber)"],
-  ].map(([k,v,c])=>`<div class="cell"><div class="lab">${k}</div><div class="val" style="color:${c}">${v}</div></div>`).join("");
-
+function renderAlt(alt,health){
+  const closed=alt.filter(t=>t.status==='closed'&&t.pnl_pct!=null);
+  const open=alt.filter(t=>t.status==='open');
+  const win=closed.length?closed.filter(t=>t.pnl_pct>0).length/closed.length*100:null;
+  const wins=closed.filter(t=>t.pnl_pct>0).reduce((s,t)=>s+t.pnl_pct,0);
+  const loss=Math.abs(closed.filter(t=>t.pnl_pct<=0).reduce((s,t)=>s+t.pnl_pct,0));
+  const pf=loss>0?wins/loss:(wins>0?9:null);
+  let eq=100;[...closed].sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at)).forEach(t=>eq+=(t.pnl_pct-0.3)/100);
+  $("#altTrades").textContent=closed.length;
+  ring($("#altRing"),eq,"#3FE0FF");
+  $("#altState").textContent=open.length+" ไม้ที่ถืออยู่ · เป้าหมาย 100 เทรด";
+  $("#altStats").innerHTML=[["เทรดปิดแล้ว",closed.length+" / 100","var(--ink)"],["อัตราชนะ",win==null?"—":fmt(win,0)+"%","var(--ink)"],["PROFIT FACTOR",pf==null?"—":fmt(pf,2),pf>=1.25?"var(--mint)":"var(--amber)"],["ถืออยู่",open.length,"var(--amber)"]].map(([k,v,c])=>`<div class="cell"><div class="lab">${k}</div><div class="val" style="color:${c}">${v}</div></div>`).join('');
   const why=$("#altWhy");
-  if(!closed.length && !open.length){
-    why.className="callout warn";
-    why.innerHTML="<b>ทำไมยังไม่มีเทรด?</b> &nbsp;ตอนนี้ Bitcoin เป็นขาลง AltBot จึงถือเงินสดเพื่อความปลอดภัย — นี่คือพฤติกรรมที่ถูกต้องตามดีไซน์ ไม่ใช่ระบบเสีย · มันจะเริ่มเทรดเองเมื่อ BTC กลับเป็นขาขึ้น";
-  } else {
-    why.className="callout";
-    why.innerHTML="<b>สถานะ:</b> ระบบกำลังเทรดตามจังหวะ BTC ขาขึ้น · ดูบันทึกแต่ละไม้ด้านล่าง";
-  }
-
+  if(!closed.length&&!open.length){why.innerHTML="<b>ทำไมยังไม่มีเทรด?</b> &nbsp;BTC ขาลง AltBot ถือเงินสดรอ — ถูกต้องตามดีไซน์";}
+  else{why.innerHTML="<b>สถานะ:</b> เทรดตามจังหวะ BTC";}
   const tb=$("#altTable").querySelector("tbody");
-  if(!alt.length){ tb.innerHTML=`<tr><td colspan="6" class="neu" style="text-align:center;padding:16px">ยังไม่มีเทรด — ปกติเมื่อ BTC เป็นขาลง ระบบถือเงินสด</td></tr>`; return; }
-  tb.innerHTML = alt.slice(0,15).map(t=>`<tr>
-    <td>${t.symbol}</td>
-    <td class="neu">${new Date(t.opened_at).toLocaleString("th-TH",{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
-    <td>${t.entry_price}</td>
-    <td class="${t.pnl_pct==null?'neu':t.pnl_pct>0?'pos':'neg'}">${t.pnl_pct==null?'—':pct(t.pnl_pct)}</td>
-    <td class="neu">${t.exit_reason||'—'}</td>
-    <td class="neu" style="font-size:11px">${t.status==='open'?'ถืออยู่':'ปิดแล้ว'}</td>
-  </tr>`).join("");
+  if(!alt.length){tb.innerHTML=`<tr><td colspan="6" class="neu" style="text-align:center;padding:16px">ยังไม่มีเทรด — ปกติเมื่อ BTC เป็นขาลง</td></tr>`;return;}
+  tb.innerHTML=alt.slice(0,12).map(t=>`<tr><td>${t.symbol}</td><td class="neu">${new Date(t.opened_at).toLocaleString("th-TH",{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${t.entry_price}</td><td class="${t.pnl_pct==null?'neu':t.pnl_pct>0?'pos':'neg'}">${t.pnl_pct==null?'—':pct(t.pnl_pct)}</td><td class="neu">${t.exit_reason||'—'}</td><td class="neu" style="font-size:11px">${t.status==='open'?'ถืออยู่':'ปิด'}</td></tr>`).join('');
 }
 
 function renderFeed(events){
-  if(!events.length){ $("#feed").innerHTML=`<div class="neu">ยังไม่มีข้อมูล</div>`; return; }
-  $("#feed").innerHTML = events.map(e=>{
-    const m=minsAgo(e.created_at);
-    const cls = e.level==='critical'?'critical':(e.level==='warn'?'warn':'');
-    return `<div class="row ${cls}">
-      <span class="src">${e.source}</span>
-      <span class="msg">${(e.message||'').replace(/</g,'&lt;')}</span>
-      <span class="ago">${m==null?'':m+'น'}</span>
+  if(!events.length){$("#feed").innerHTML=`<div class="neu">ยังไม่มีข้อมูล</div>`;return;}
+  $("#feed").innerHTML=events.map(e=>`<div class="row ${e.level}"><span class="src">${e.source}</span><span class="msg">${(e.message||'').replace(/</g,'&lt;')}</span><span class="ago">${minsAgo(e.created_at)||''}น</span></div>`).join('');
+}
+
+function renderLab(caseLog,stratLab,entryLab){
+  // EXIT STRATEGY
+  const sl=stratLab[0]||{};
+  const strats=[
+    {n:"ขายที่ 15 นาที",v:sl["ขายที่ 15 นาที"]},
+    {n:"ขายที่ 30 นาที",v:sl["ขายที่ 30 นาที"]},
+    {n:"ขายที่ 60 นาที",v:sl["ขายที่ 60 นาที"]},
+    {n:"Trailing -15%",v:sl["trailing -15%"]},
+    {n:"Trailing -25%",v:sl["trailing -25%"]},
+    {n:"TP+50 หรือ 60นาที",v:sl["TP+50 หรือ 60นาที"]},
+    {n:"SL-20 หรือ 60นาที",v:sl["SL-20 หรือ 60นาที"]},
+  ].filter(s=>s.v!=null);
+  const coins=sl.coins_complete_path||0;
+
+  if(!strats.length||coins<2){
+    $("#stratGrid").innerHTML=`<div style="text-align:center;padding:20px;color:var(--dim);font-size:13px">⏳ กำลังสะสมข้อมูล path สมบูรณ์ — ตอนนี้ ${coins} เหรียญ (ต้องการอย่างน้อย 5 เหรียญ)<br><span style="font-size:11px">เหรียญใหม่ทุกตัวตั้งแต่นี้จะมี path ครบ คาดว่ามีข้อมูลพอใน 1-2 สัปดาห์</span></div>`;
+  } else {
+    const best=strats.reduce((b,s)=>s.v>b.v?s:b,strats[0]);
+    $("#stratGrid").innerHTML=`<p style="font-size:11.5px;color:var(--dim);margin-bottom:12px">จาก ${coins} เหรียญที่มี path สมบูรณ์ | พีคเฉลี่ย ${pct(sl["พีคเฉลี่ย"])} ที่นาที ${sl["นาทีถึงพีคเฉลี่ย"]||'—'}</p><div class="strat-grid">${strats.map(s=>`<div class="strat-cell ${s.n===best.n?'best':''}"><div class="sn">${s.n}</div><div class="sv" style="color:${s.v>0?'var(--mint)':s.v<0?'var(--coral)':'var(--dim)'}">${pct(s.v)}</div>${s.n===best.n?'<span class="badge">🏆 ดีสุด</span>':''}</div>`).join('')}</div>`;
+  }
+
+  // ENTRY TIMING
+  if(!entryLab.length){$("#entryGrid").innerHTML=`<div class="loading">ยังไม่มีข้อมูล</div>`;
+  } else {
+    $("#entryGrid").innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>จังหวะเข้า</th><th>n</th><th>พีคเฉลี่ย</th><th>ขาย 30 นาที</th><th>ขาย 1 ชม.</th><th>มีจังหวะ+20%</th></tr></thead><tbody>${entryLab.map(r=>`<tr><td>${r.จังหวะเข้า}</td><td class="neu">${r.n}</td><td class="${r.พีคเฉลี่ย>20?'pos':'neu'}">${pct(r.พีคเฉลี่ย)}</td><td class="${r.ขาย30นาที>0?'pos':'neg'}">${pct(r.ขาย30นาที)}</td><td class="${r.ขาย1ชม>0?'pos':'neg'}">${pct(r.ขาย1ชม)}</td><td class="${r.มีจังหวะกำไร_pct>=50?'pos':'neu'}">${r.มีจังหวะกำไร_pct||'—'}%</td></tr>`).join('')}</tbody></table></div><p style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6">⚠️ N น้อยมาก ยังไม่ควรสรุป — เก็บข้อมูลต่อ path สมบูรณ์จะทำให้ตัวเลขน่าเชื่อถือขึ้นเรื่อยๆ</p>`;
+  }
+
+  // CASE STUDY CARDS
+  if(!caseLog.length){$("#caseCards").innerHTML=`<div class="loading">⟳ กำลังสร้าง case studies…</div>`;return;}
+  $("#caseCards").innerHTML=caseLog.map(c=>{
+    const badgeColor=c.status==='final'?'var(--mint)':'var(--amber)';
+    const simRows=[
+      ['ออกที่ 15 นาที',c.sim_exit_15m],['ออกที่ 30 นาที',c.sim_exit_30m],['ออกที่ 60 นาที',c.sim_exit_60m],
+      ['Trailing -15%',c.sim_trail_15],['Trailing -25%',c.sim_trail_25],
+      ['TP+50 / 60นาที',c.sim_tp50_or_60m],['SL-20 / 60นาที',c.sim_sl20_or_60m],
+    ].filter(([,v])=>v!=null);
+    const bestSim=simRows.length?simRows.reduce((b,r)=>r[1]>b[1]?r:b,simRows[0]):null;
+    return`<div class="case-card">
+      <div class="cc-head">
+        <div><div class="cc-sym">${c.symbol||'?'}</div><div class="cc-meta">เจอตอนพุ่ง ${pct(c.entry_pump)} · Liq $${fmt(c.liquidity_usd,0)} · tick ${c.ticks_n||0} จุด · ${c.path_complete?'<span style="color:var(--mint)">✓ path ครบ</span>':'<span style="color:var(--amber)">⚠ path ไม่ครบ</span>'}</div></div>
+        <span class="cc-badge" style="background:${badgeColor}22;color:${badgeColor};border:1px solid ${badgeColor}">${c.status==='final'?'✅ บันทึกสมบูรณ์':'⏳ กำลังติดตาม'}</span>
+      </div>
+      ${c.recommendation?`<div class="cc-rec">${c.recommendation}</div>`:''}
+      <div class="cc-stats">
+        <div class="cs"><div class="ck">พีค</div><div class="cv pos">${pct(c.peak_pct)}</div><div style="font-size:10px;color:var(--dim)">ที่นาที ${c.peak_min||'—'}</div></div>
+        <div class="cs"><div class="ck">ต่ำสุด</div><div class="cv neg">${pct(c.trough_pct)}</div></div>
+        <div class="cs"><div class="ck">ผล 1ชม.</div><div class="cv ${c.pnl_h1>0?'pos':c.pnl_h1<0?'neg':'neu'}">${pct(c.pnl_h1)}</div></div>
+        ${bestSim?`<div class="cs" style="border-color:var(--mint)"><div class="ck">กลยุทธ์ดีสุด</div><div class="cv pos">${pct(bestSim[1])}</div><div style="font-size:10px;color:var(--dim)">${bestSim[0]}</div></div>`:''}
+        ${simRows.length>1?`<div class="cs"><div class="ck">แย่สุด</div><div class="cv neg">${pct(simRows.reduce((b,r)=>r[1]<b[1]?r:b,simRows[0])[1])}</div></div>`:''}
+      </div>
     </div>`;
-  }).join("");
+  }).join('');
 }
 
-function renderManualNow(h, signals, alt){
-  const scanHr=hrsAgo(h.last_scan);
-  const live = scanHr!=null && scanHr<2.5;
-  const txt = live
-    ? `ระบบ<b style="color:var(--mint)"> ทำงานปกติ</b> · MemeBot จับสัญญาณได้แล้ว ${signals.length} ครั้ง (เป้า 200) · AltBot ${alt.filter(t=>t.status==='closed').length} เทรด (เป้า 100) · ทั้งคู่ยังเล่นเงินปลอม กำลังเก็บข้อมูลพิสูจน์กลยุทธ์`
-    : `⚠ ระบบอาจหยุดทำงาน — Scanner ไม่ได้ส่งสัญญาณชีพมานานแล้ว ลองเปิด n8n เช็คว่า workflow ยัง Active อยู่ไหม`;
-  $("#manualNow").innerHTML = txt;
-}
-
-// ===================== TABS =====================
+// TABS
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
-    ["overview","meme","alt","manual"].forEach(id=>$("#tab-"+id).classList.toggle("hidden", id!==t.dataset.tab));
+    ["overview","meme","alt","lab","manual"].forEach(id=>$("#tab-"+id).classList.toggle("hidden",id!==t.dataset.tab));
   });
 });
 
-// ===================== CLOCK + BOOT =====================
-setInterval(()=>{ $("#clock").textContent = new Date().toLocaleTimeString("th-TH"); }, 1000);
+setInterval(()=>$("#clock").textContent=new Date().toLocaleTimeString("th-TH"),1000);
 load();
-setInterval(load, 120000);
+setInterval(load,120000);
 </script>
 </body>
 </html>
