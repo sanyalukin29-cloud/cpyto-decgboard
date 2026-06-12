@@ -469,7 +469,7 @@ function renderMeme(signals, outcomes, quality){
   const win = h1.length ? h1.filter(p=>p>0).length/h1.length*100 : null;
   const netAvg = h1.length ? h1.reduce((s,x)=>s+x,0)/h1.length - 2 : null;
   const median = h1.length ? h1[Math.floor(h1.length/2)] : null;
-  let eq=100; ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).forEach(o=>eq*=1+(o.pnl_pct-2)/100);
+  let eq=100; ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).forEach(o=>eq+=(o.pnl_pct-2)/100);
   const totQ = quality.reduce((s,q)=>s+q.n,0);
   const badQ = quality.filter(q=>q.measure_status!=='measured').reduce((s,q)=>s+q.n,0);
   const apiErrPct = totQ? badQ/totQ*100 : 0;
