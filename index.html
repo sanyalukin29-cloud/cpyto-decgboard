@@ -1,154 +1,74 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PORDEE TRADING · Mission Control v4</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pordee Trading · Strategy Proof Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#03060E;--bg2:#060B18;--panel:rgba(10,18,36,0.82);--line:rgba(70,160,255,0.20);--line2:rgba(70,160,255,0.08);--cyan:#3FE0FF;--violet:#B98CFF;--mint:#4DF2B0;--coral:#FF6B7E;--amber:#FFC24B;--gold:#FFD66B;--orange:#FF9D4B;--ink:#E4EEFF;--dim:#7C93BE;--mono:'IBM Plex Mono',monospace;--thai:'IBM Plex Sans Thai',sans-serif;--display:'Orbitron',sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);color:var(--ink);font-family:var(--thai);min-height:100vh;overflow-x:hidden}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--thai);min-height:100vh;overflow-x:hidden}
 .gf{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(63,224,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(63,224,255,0.05) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 25%,transparent 95%)}
 .go{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none;z-index:0}
 .o1{width:520px;height:520px;background:radial-gradient(circle,#163a6e,transparent 70%);top:-180px;left:-120px}
-.o2{width:460px;height:460px;background:radial-gradient(circle,#3a1d6e,transparent 70%);top:10%;right:-160px}
+.o2{width:460px;height:460px;background:radial-gradient(circle,#3a1d6e,transparent 70%);top:8%;right:-160px}
 .sl{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.18) 2px 4px)}
-.w{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:16px 12px 80px}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:42px;height:42px;border:1.5px solid var(--cyan);border-radius:9px;display:grid;place-items:center;box-shadow:0 0 20px rgba(63,224,255,0.4),inset 0 0 12px rgba(63,224,255,0.15);animation:spin 8s linear infinite}
-@keyframes spin{to{filter:hue-rotate(360deg)}}
-.brand h1{font-family:var(--display);font-size:17px;font-weight:900;letter-spacing:.16em;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.28em;margin-top:2px}
-.sc{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.lb{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;padding:6px 12px;border:1px solid var(--line);border-radius:28px;background:var(--panel)}
-.led{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber)}
-.led.on{background:var(--mint);box-shadow:0 0 10px var(--mint);animation:pl 1.6s ease-in-out infinite}
-.led.off{background:var(--coral);box-shadow:0 0 10px var(--coral)}
-@keyframes pl{0%,100%{opacity:1}50%{opacity:.3}}
-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
-.tab{font-family:var(--mono);font-size:12px;letter-spacing:.07em;padding:9px 16px;cursor:pointer;background:transparent;color:var(--dim);border:1px solid var(--line2);border-radius:6px;transition:.15s}
-.tab:hover{color:var(--ink);border-color:var(--line)}
-.tab.active{color:var(--bg);font-weight:600}
-.tab.tc{background:var(--cyan);box-shadow:0 0 18px rgba(63,224,255,.4)}
-.tab.tv{background:var(--violet);box-shadow:0 0 18px rgba(185,140,255,.4)}
-.tab.tm{background:var(--mint);box-shadow:0 0 18px rgba(77,242,176,.4)}
-.tab.to{background:var(--orange);box-shadow:0 0 18px rgba(255,157,75,.4)}
-.tab.tg{background:var(--gold);box-shadow:0 0 18px rgba(255,214,107,.4)}
-.p{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px;backdrop-filter:blur(8px)}
-.c{position:absolute;width:10px;height:10px;border:2px solid var(--cyan)}
-.c.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}.c.tr{top:-1px;right:-1px;border-left:0;border-bottom:0}
-.c.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}.c.br{bottom:-1px;right:-1px;border-left:0;border-top:0}
-.pt{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.pt .b{width:16px;height:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.cel{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:6px;padding:12px 14px}
-.cel .lb2{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
-.cel .v{font-family:var(--mono);font-weight:600;font-size:22px;margin-top:4px;line-height:1}
-.cel .h{font-size:11px;color:var(--dim);margin-top:4px;line-height:1.5}
-.info{display:inline-grid;place-items:center;width:13px;height:13px;border:1px solid var(--dim);border-radius:50%;font-size:8px;color:var(--dim);cursor:help;font-family:var(--mono);position:relative;flex-shrink:0}
-.info:hover{border-color:var(--cyan);color:var(--cyan)}
-.info .tip{visibility:hidden;opacity:0;position:absolute;bottom:120%;left:50%;transform:translateX(-50%);width:210px;background:#0a1426;border:1px solid var(--cyan);border-radius:6px;padding:9px 11px;font-family:var(--thai);font-size:11.5px;line-height:1.6;color:var(--ink);text-align:left;z-index:50;pointer-events:none}
-.info:hover .tip{visibility:visible;opacity:1}
-.hc{background:rgba(8,14,28,.9);border-left:3px solid var(--mint);border-radius:0 6px 6px 0;padding:11px 13px}
-.hc.bad{border-left-color:var(--coral)}
-.hc .hk{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
-.hc .hv{font-family:var(--mono);font-weight:600;font-size:16px;margin-top:3px}
-.hc .ht{font-size:11px;color:var(--dim);margin-top:2px}
-.rng{position:relative;width:90px;height:90px;flex-shrink:0}
-.rng svg{transform:rotate(-90deg)}
-.rng .rc{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-.rng .rc b{font-family:var(--mono);font-size:14px;font-weight:700;display:block;line-height:1.2}
-.rng .rc s{font-family:var(--mono);font-size:7px;color:var(--dim);text-decoration:none;letter-spacing:.1em}
-.react{display:flex;align-items:center;gap:14px}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:440px}
-thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;text-align:right;padding:7px 5px;font-weight:400;border-bottom:1px solid var(--line)}
-thead th:first-child{text-align:left}
-tbody td{font-family:var(--mono);text-align:right;padding:9px 5px;border-bottom:1px solid var(--line2)}
-tbody td:first-child{text-align:left;font-family:var(--thai);font-weight:600}
-.pos{color:var(--mint)}.neg{color:var(--coral)}.neu{color:var(--dim)}
-.fd{font-family:var(--mono);font-size:11px;max-height:220px;overflow-y:auto}
-.fd .r{display:flex;gap:9px;padding:6px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
-.fd .r.warn .m{color:var(--amber)}.fd .r.critical .m{color:var(--coral)}
-.fd .src{flex-shrink:0;width:70px;color:var(--cyan);text-transform:uppercase;font-size:9.5px}
-.fd .m{color:var(--ink);flex:1;word-break:break-word}
-.fd .ag{flex-shrink:0;color:var(--dim);font-size:9.5px}
-/* SCORE */
-.sc-bar{height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.06);margin-top:5px}
-.sc-fill{height:100%;border-radius:3px;transition:width .5s ease}
-.score-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
-/* RULE CARDS */
-.rule-card{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:13px 14px;margin-bottom:10px}
-.rule-card.good{border-left-color:var(--mint)}.rule-card.warn{border-left-color:var(--amber)}.rule-card.bad{border-left-color:var(--coral)}
-.rule-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
-.rule-body{font-size:13.5px;line-height:1.7;color:var(--ink)}
-.rule-body b{color:var(--mint)}
-.rule-body .rb{color:var(--coral)}
-/* TIMELINE */
-.tl{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:10px 0;font-family:var(--mono);font-size:11px}
-.tl-node{background:rgba(8,14,28,.95);border:1px solid var(--line2);border-radius:5px;padding:6px 9px;text-align:center;min-width:72px}
-.tl-node.entry{border-color:var(--cyan)}.tl-node.peak{border-color:var(--gold)}.tl-node.exit_good{border-color:var(--mint)}.tl-node.exit_bad{border-color:var(--coral)}
-.tl-label{font-size:8.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
-.tl-price{font-size:11px;font-weight:600;margin:2px 0}
-.tl-pct{font-size:10px}
-.tl-arrow{color:var(--dim);font-size:14px;flex-shrink:0}
-/* HALL OF FAME */
-.hof{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:8px;padding:14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
-.hof-icon{font-size:28px;flex-shrink:0}
-.hof-body{flex:1}
-.hof-sym{font-family:var(--mono);font-weight:600;font-size:15px}
-.hof-stat{font-size:12px;color:var(--dim);margin:4px 0}
-.hof-lesson{font-size:12.5px;line-height:1.65;margin-top:6px;padding:8px 10px;background:rgba(255,255,255,.03);border-left:2px solid var(--violet);border-radius:0 4px 4px 0}
-/* CASE CARD */
-.cc{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:8px;padding:13px;margin-bottom:10px}
-.cc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:9px}
-.cc-sym{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--cyan)}
-.cc-meta{font-size:10.5px;color:var(--dim);margin-top:2px}
-.cc-badge{font-size:10px;padding:2px 9px;border-radius:10px;font-family:var(--mono);font-weight:600;white-space:nowrap}
-.cc-rec{font-size:12px;line-height:1.7;color:var(--ink);background:rgba(255,255,255,.03);border-left:2px solid var(--violet);padding:9px 11px;border-radius:0 5px 5px 0;margin-bottom:9px}
-.cc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:7px}
-.cs{background:rgba(63,224,255,.03);border-radius:4px;padding:6px 9px}
-.cs .ck{font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em}
-.cs .cv{font-family:var(--mono);font-weight:600;font-size:13px;margin-top:2px}
-/* STRAT */
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin:10px 0}
-.sc2{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-radius:6px;padding:11px 9px;text-align:center;position:relative}
-.sc2.best{border-color:var(--mint);box-shadow:0 0 10px rgba(77,242,176,.15)}
-.sc2 .sn{font-size:9.5px;color:var(--dim);font-family:var(--mono);margin-bottom:5px}
-.sc2 .sv{font-family:var(--mono);font-weight:600;font-size:17px}
-.sc2 .sbest{position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--mint);color:var(--bg);font-size:8.5px;padding:2px 6px;border-radius:8px;font-family:var(--mono);font-weight:600;white-space:nowrap}
-/* GATE */
-.gate{margin-bottom:14px}
-.gate .gt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px}
-.gate .gn{font-family:var(--thai);font-size:13px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:6px}
-.gate .gv{font-family:var(--mono);font-size:13px;font-weight:600}
-.gate .gx{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5}
-.track{height:7px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
-.fill{height:100%;border-radius:4px;transition:width .5s ease}
-.fill.ok{background:linear-gradient(90deg,#2a8f6a,var(--mint));box-shadow:0 0 8px var(--mint)}
-.fill.vi{background:linear-gradient(90deg,#5a3a8f,var(--violet));box-shadow:0 0 8px var(--violet)}
-/* MANUAL */
-.man h2{font-family:var(--display);font-size:14px;letter-spacing:.09em;color:var(--cyan);margin:20px 0 9px;display:flex;align-items:center;gap:8px}
-.man h2:first-child{margin-top:0}
-.man h2 .n{font-family:var(--mono);font-size:11px;color:var(--bg);background:var(--cyan);width:22px;height:22px;display:grid;place-items:center;border-radius:5px}
-.man p{font-size:13px;line-height:1.85;color:var(--ink);margin-bottom:9px}
-.gloss{display:grid;gap:9px;margin:6px 0}
-.gi{background:rgba(8,14,28,.9);border:1px solid var(--line2);border-left:3px solid var(--violet);border-radius:0 6px 6px 0;padding:10px 13px}
-.gi .gt2{font-family:var(--mono);font-size:12.5px;color:var(--violet);font-weight:600;margin-bottom:3px}
-.gi .gd{font-size:12px;line-height:1.7;color:var(--ink)}
-.cll{background:rgba(63,224,255,.06);border:1px solid var(--line);border-radius:7px;padding:13px 15px;margin:10px 0}
-.cll.warn{background:rgba(255,194,75,.07);border-color:rgba(255,194,75,.3)}
-.cll.dng{background:rgba(255,107,126,.07);border-color:rgba(255,107,126,.3)}
-.cll b{color:var(--cyan)}.cll.warn b{color:var(--amber)}.cll.dng b{color:var(--coral)}
-ul.cl{list-style:none;display:grid;gap:7px;margin:7px 0}
-ul.cl li{display:flex;gap:9px;font-size:13px;line-height:1.6;align-items:flex-start}
-ul.cl li::before{content:'▸';color:var(--mint);flex-shrink:0}
-.hidden{display:none}
-.loading{text-align:center;padding:20px;color:var(--dim);font-family:var(--mono);font-size:12px}
-footer{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);text-align:center;line-height:1.9}
-::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.w{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:16px 12px 90px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line2);margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:42px;height:42px;border:1.5px solid var(--cyan);border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-weight:800;color:var(--cyan);box-shadow:0 0 18px rgba(63,224,255,.25);font-size:18px}
+.brand h1{font-family:var(--display);font-size:16px;letter-spacing:1px;font-weight:800}
+.brand p{font-size:11px;color:var(--dim);letter-spacing:.5px;margin-top:2px}
+.live{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--mint);border:1px solid var(--line);padding:6px 11px;border-radius:20px;background:rgba(77,242,176,.06)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 70%,transparent);padding:8px 0}
+nav a{font-family:var(--mono);font-size:11.5px;color:var(--dim);border:1px solid var(--line2);padding:7px 12px;border-radius:8px;text-decoration:none;transition:.15s;white-space:nowrap}
+nav a:hover{color:var(--cyan);border-color:var(--line)}
+.p{position:relative;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:16px;margin-bottom:16px;backdrop-filter:blur(6px)}
+.p::before{content:"";position:absolute;left:0;top:14px;width:3px;height:24px;background:var(--cyan);border-radius:0 3px 3px 0;box-shadow:0 0 10px var(--cyan)}
+.pt{font-family:var(--display);font-size:13px;letter-spacing:.6px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sub{font-size:11.5px;color:var(--dim);margin-bottom:13px;line-height:1.6}
+.loading{font-family:var(--mono);font-size:12px;color:var(--dim);padding:18px;text-align:center}
+.err{font-family:var(--mono);font-size:11px;color:var(--coral);padding:12px;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.5px;color:var(--dim);text-align:right;padding:8px 7px;border-bottom:1px solid var(--line);text-transform:uppercase;font-weight:400}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 7px;border-bottom:1px solid var(--line2);text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.tag{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px;display:inline-block}
+.win{background:rgba(77,242,176,.12);color:var(--mint)}
+.lose{background:rgba(255,107,126,.12);color:var(--coral)}
+.warn{background:rgba(255,194,75,.12);color:var(--amber)}
+.pos{color:var(--mint)}.neg{color:var(--coral)}.neu{color:var(--ink)}
+.star{background:linear-gradient(90deg,rgba(255,214,107,.18),rgba(255,214,107,.04));border:1px solid rgba(255,214,107,.3)!important}
+.starcell{color:var(--gold);font-weight:600}
+.banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bmeter{flex:1;min-width:180px}
+.bbar{height:9px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;margin-top:7px}
+.bbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--orange),var(--gold))}
+.bstats{display:flex;gap:18px;flex-wrap:wrap}
+.bstat b{font-family:var(--display);font-size:18px;display:block}
+.bstat s{font-size:10px;color:var(--dim);text-decoration:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{border:1px solid var(--line2);border-radius:11px;padding:13px}
+.card h4{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-bottom:8px;font-weight:400;letter-spacing:.3px}
+.card .big{font-family:var(--display);font-size:22px;line-height:1}
+.card .meta{font-size:11px;color:var(--dim);margin-top:7px;line-height:1.5}
+.callout{border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-top:13px;font-size:12px;line-height:1.7;background:rgba(63,224,255,.04)}
+.callout b{color:var(--cyan)}
+.rb{border:1px solid var(--line2);border-radius:12px;padding:14px;margin-bottom:11px;border-left:3px solid var(--mint)}
+.rb.avoid{border-left-color:var(--coral)}.rb.exit{border-left-color:var(--violet)}.rb.never{border-left-color:var(--orange)}
+.rb h3{font-family:var(--mono);font-size:11px;letter-spacing:.5px;color:var(--dim);margin-bottom:6px}
+.rb .rule{font-size:14px;font-weight:600;line-height:1.6;margin-bottom:6px}
+.rb .ev{font-size:11px;color:var(--dim);line-height:1.6}
+.rb .ev b{color:var(--ink)}
+.note{font-size:11px;color:var(--amber);background:rgba(255,194,75,.06);border:1px solid rgba(255,194,75,.18);border-radius:9px;padding:10px 12px;line-height:1.65;margin-top:8px}
+footer{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:24px;line-height:1.8}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:560px){.brand h1{font-size:14px}table{font-size:11px}th,td{padding:7px 5px}}
 </style>
 </head>
 <body>
@@ -156,518 +76,331 @@ footer{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);t
 <div class="w">
   <header>
     <div class="brand">
-      <div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3FE0FF" stroke-width="1.5"><path d="M12 2L21 7V17L12 22L3 17V7Z"/><circle cx="12" cy="12" r="3.5" stroke="#B98CFF"/></svg></div>
-      <div><h1>PORDEE TRADING</h1><div class="sub">MISSION CONTROL v4 · FORWARD TEST</div></div>
+      <div class="logo">P</div>
+      <div><h1>PORDEE TRADING</h1><p>STRATEGY PROOF LAB · MemeBot</p></div>
     </div>
-    <div class="sc">
-      <div class="lb"><span class="led" id="ll"></span><span id="lt">CONNECTING…</span></div>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--dim)" id="ck"></span>
-    </div>
+    <div class="live"><span class="dot"></span><span id="liveTxt">เชื่อมต่อ…</span></div>
   </header>
+
   <nav>
-    <button class="tab active tc" data-tab="ov">⬡ ภาพรวม</button>
-    <button class="tab tv" data-tab="mm">🟣 MEMEBOT</button>
-    <button class="tab tm" data-tab="ab">🔵 ALTBOT</button>
-    <button class="tab to" data-tab="lb">🧪 LAB วิเคราะห์</button>
-    <button class="tab tg" data-tab="mn">📖 คู่มือ</button>
+    <a href="#sample">📊 สถานะ</a>
+    <a href="#ver">🆚 v1·v2·v3</a>
+    <a href="#v5">🛡️ v5 Guard</a>
+    <a href="#grid">🔬 Grid Search</a>
+    <a href="#golden">⭐ Golden Filter</a>
+    <a href="#liq">💧 Liquidity</a>
+    <a href="#rug">☠️ Rug / Hold</a>
+    <a href="#rules">📜 Rulebook</a>
   </nav>
 
-  <!-- OVERVIEW -->
-  <section id="tab-ov">
-    <div class="p" id="kp"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>สถานะหัวใจระบบ · SYSTEM VITALS <span class="info">i<span class="tip">ทั้ง 4 ส่วนต้องเป็นสีเขียว ONLINE — แดง STALE = บอทตัวนั้นหยุด ต้องดูใน Supabase</span></span></div>
-      <div class="g4" id="hg"><div class="loading">⟳</div></div>
-    </div>
-    <div class="g2">
-      <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="pt"><span class="b"></span>🟣 MEMEBOT · ทุนจำลอง <span class="info">i<span class="tip">เริ่ม ฿10,000 เดิมพัน 1%/ไม้ — ฿9,800 = ขาดทุน ฿200</span></span></div>
-        <div class="react"><div class="rng" id="mr"></div>
-          <div><div class="cel" style="border:0;background:transparent;padding:0">
-            <div class="lb2">สัญญาณทั้งหมด</div><div class="v" id="ms">—</div>
-            <div class="h">เป้า 200 · tick เก็บแล้ว <span id="tc">—</span></div>
-          </div></div>
-        </div>
-      </div>
-      <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="pt"><span class="b"></span>🔵 ALTBOT · ทุนจำลอง</div>
-        <div class="react"><div class="rng" id="ar"></div>
-          <div><div class="cel" style="border:0;background:transparent;padding:0">
-            <div class="lb2">เทรดปิดแล้ว</div><div class="v" id="at">—</div>
-            <div class="h" id="as">—</div>
-          </div></div>
-        </div>
-      </div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>💡 คำแนะนำสดจากข้อมูลจริง · LIVE STRATEGY HINTS</div>
-      <div id="hints"><div class="loading">⟳</div></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>บันทึกสด · LIVE TELEMETRY</div>
-      <div class="fd" id="fd"><div class="loading">⟳</div></div>
-    </div>
-  </section>
+  <div class="p" id="sample">
+    <div class="pt">📊 สถานะตัวอย่าง · ความเชื่อมั่น</div>
+    <div class="sub">เก็บ path ราคาจริงไปแล้วกี่ % ของเป้า 200 สัญญาณ — ยิ่งน้อย ยิ่งต้องระวังว่าผลที่เห็นอาจเป็นฟลุก</div>
+    <div id="sampleBox"><div class="loading">⟳ กำลังโหลด…</div></div>
+  </div>
 
-  <!-- MEMEBOT -->
-  <section id="tab-mm" class="hidden">
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>AIRLOCK v2 · ประตูนิรภัยก่อนใช้เงินจริง</div>
-      <div id="mg"><div class="loading">⟳</div></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>🎯 สัญญาณล่าสุด + คะแนน Signal Score <span class="info">i<span class="tip">Signal Score 0-100 คำนวณจาก: เข้าเร็ว (พุ่งน้อย=ดี) + Liquidity สูง + อายุน้อย + Volume สูง สีเขียว=น่าสนใจ สีแดง=เสี่ยงสูง</span></span></div>
-      <div class="tw"><table id="mt"><thead><tr><th>เหรียญ</th><th>Score</th><th>จังหวะเข้า</th><th>พุ่งตอนเจอ</th><th>Liq</th><th>อายุ</th><th>ผล 1ชม.</th></tr></thead><tbody><tr><td colspan="7" class="loading">⟳</td></tr></tbody></table></div>
-    </div>
-  </section>
+  <div class="p" id="ver">
+    <div class="pt">🆚 เปรียบเทียบเวอร์ชัน v1 · v2 · v3</div>
+    <div class="sub">v1 = จับทุกเหรียญ · v2 = กรอง pump&lt;30 · v3 = pump&lt;20 + trailing 25% (robust winner) — ตัวชี้วัดสำคัญสุดคือ <b>Trailing 25% net</b> (หลังหัก fee)</div>
+    <div class="scroll"><div id="verBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
 
-  <!-- ALTBOT -->
-  <section id="tab-ab" class="hidden">
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>เกณฑ์ผ่าน · GATE STATUS</div>
-      <div class="g4" id="ags"><div class="loading">⟳</div></div>
-      <div class="cll warn" id="aw" style="margin-top:12px"></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>บันทึกเทรด · TRADE LOG</div>
-      <div class="tw"><table id="alt"><thead><tr><th>เหรียญ</th><th>เวลาเข้า</th><th>ราคาเข้า</th><th>กำไร/ขาดทุน</th><th>เหตุออก</th><th>สถานะ</th></tr></thead><tbody><tr><td colspan="6" class="loading">⟳</td></tr></tbody></table></div>
-    </div>
-  </section>
+  <div class="p" id="v5">
+    <div class="pt">🛡️ v5 · LIQUIDITY-GUARDED MemeBot</div>
+    <div class="sub">เทียบ 3 ทางออกในแต่ละกลุ่ม: ถือยาว (hold h1) · trailing 30% · liquidity-guard (ขายเมื่อ liq หาย &gt;15%) — guard ออกแบบมาเพื่อ "หนี rug ให้ทันก่อนตาย"</div>
+    <div class="scroll"><div id="guardBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+    <div class="pt" style="margin-top:18px;font-size:11.5px">🏆 เหรียญที่ guard ช่วยได้มากสุด (guard_saved)</div>
+    <div class="scroll"><div id="guardCoinBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
 
-  <!-- LAB -->
-  <section id="tab-lb" class="hidden">
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>📋 กฎกลยุทธ์สด (อัปเดตอัตโนมัติจากข้อมูลจริง) <span class="info">i<span class="tip">กฎเหล่านี้มาจากข้อมูลจริงที่สะสม ยิ่งมีเหรียญมาก ยิ่งแม่น — ตอนนี้ยังน้อย อย่าเพิ่งตัดสิน</span></span></div>
-      <div id="rules"><div class="loading">⟳</div></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>📊 เปรียบเทียบกลยุทธ์ออก · EXIT STRATEGY LAB</div>
-      <div id="sg"><div class="loading">⟳</div></div>
-    </div>
-    
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>🆚 เปรียบเทียบกลยุทธ์ v1 · v2 · v3 · A/B TEST
-        <span class="info">i<span class="tip">v1 = จับทุกเหรียญ ไม่มี trailing | v2 = กรอง pump&lt;30% | v3 = กรอง pump&lt;20% + trailing stop 25% (ผู้ชนะ robust จาก grid search) — ตัวชี้วัดสำคัญสุดคือ "Trailing 25% net" หลังหัก fee</span></span>
-      </div>
-      <div id="abCompare"><div class="loading">⟳ กำลังโหลด…</div></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>🔬 GRID SEARCH · ค้นหากลยุทธ์ดีสุดจากข้อมูลจริง
-        <span class="info">i<span class="tip">ทดสอบทุกคอมโบ (เกณฑ์เข้า × trailing stop) จาก path ราคาจริง — คอลัมน์ "net หักตัวดีสุด" = ผลถ้าตัดเหรียญที่ดีสุดออก 1 ตัว ถ้ายังบวก = ทนทานจริงไม่ใช่ฟลุกจากเหรียญเดียว</span></span>
-      </div>
-      <p style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6">net = กำไรเฉลี่ยต่อเหรียญหลังหัก fee 2% · <b style="color:var(--mint)">net หักตัวดีสุด</b> = ตัวชี้วัดความทนทาน (robustness) ยิ่งสูงยิ่งพึ่งพาได้</p>
-      <div id="gridSearch"><div class="loading">⟳ กำลังโหลด…</div></div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>⏱ จังหวะเข้าที่ดีที่สุด · ENTRY TIMING</div>
-      <div id="eg"><div class="loading">⟳</div></div>
-    </div>
-    <div class="g2">
-      <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="pt"><span class="b"></span>🏆 Hall of Fame · เหรียญดีสุด</div>
-        <div id="hof_best"><div class="loading">⟳</div></div>
-      </div>
-      <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-        <div class="pt"><span class="b"></span>💀 Hall of Shame · เหรียญแย่สุด</div>
-        <div id="hof_worst"><div class="loading">⟳</div></div>
-      </div>
-    </div>
-    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>📖 กรณีศึกษา รายเหรียญ · CASE STUDY LOG (Timeline เข้า/ออก)</div>
-      <div id="cs"><div class="loading">⟳</div></div>
-    </div>
-  </section>
+  <div class="p" id="grid">
+    <div class="pt">🔬 GRID SEARCH · ค้นหากลยุทธ์ดีสุดจากข้อมูลจริง</div>
+    <div class="sub">ทดสอบทุกคอมโบ (เกณฑ์เข้า × trailing) จาก path ราคาจริง — คอลัมน์ <b>net หักตัวดีสุด</b> = ผลถ้าตัดเหรียญดีสุดออก 1 ตัว ถ้ายังบวก = ทนทานจริง ไม่ใช่ฟลุกจากเหรียญเดียว</div>
+    <div class="scroll"><div id="gridBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
 
-  <!-- MANUAL -->
-  <section id="tab-mn" class="hidden">
-    <div class="p man"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <h2><span class="n">1</span>ระบบนี้คืออะไร</h2>
-      <p>บอทเทรดคริปโต 2 ตัว รันอัตโนมัติบน Supabase ฟรีตลอด ไม่หลับ — ทั้งคู่<b> ยังเล่นเงินปลอม</b> เพื่อพิสูจน์กลยุทธ์ก่อนเสี่ยงเงินจริง</p>
-      <div class="gloss">
-        <div class="gi"><div class="gt2">🟣 MemeBot</div><div class="gd">ส่องเหรียญใหม่ Solana (1-12 ชม.) เก็บราคาทุก 2 นาที วิเคราะห์ว่าเข้า/ออกเวลาต่างกันจะได้กำไรเท่าไหร่</div></div>
-        <div class="gi"><div class="gt2">🔵 AltBot</div><div class="gd">เทรด DOGE/SOL/ETH เฉพาะตอน BTC ขาขึ้น — ตอนนี้ BTC ขาลงจึงถือเงินสด = ปกติ</div></div>
-        <div class="gi"><div class="gt2">🧪 LAB วิเคราะห์</div><div class="gd">ห้องแล็บ: กฎกลยุทธ์จากข้อมูลจริง + Signal Score + Timeline เข้า/ออก + Hall of Fame — ใช้ออกแบบ MemeBot v2</div></div>
-      </div>
-      <h2><span class="n">2</span>Signal Score คืออะไร อ่านยังไง</h2>
-      <p>คะแนน 0-100 ที่บอกว่าเหรียญนี้ "น่าสนใจ" แค่ไหนตามกฎที่ข้อมูลสนับสนุน:</p>
-      <div class="gloss">
-        <div class="gi"><div class="gt2">🟢 70-100 น่าสนใจมาก</div><div class="gd">เหรียญยังไม่ได้พุ่งมาก (entry pump ต่ำ) + อายุน้อย + liquidity สูง — จากข้อมูล: เข้าช่วงนี้เฉลี่ยกำไรได้</div></div>
-        <div class="gi"><div class="gt2">🟡 50-70 พอใช้ได้</div><div class="gd">ผ่านเกณฑ์บางส่วน — มีโอกาสกำไรแต่ต้องระวัง</div></div>
-        <div class="gi"><div class="gt2">🟠 30-50 ระวัง</div><div class="gd">เหรียญพุ่งไปพอสมควรแล้ว หรือ liquidity ต่ำ — ความเสี่ยงสูงขึ้น</div></div>
-        <div class="gi"><div class="gt2">🔴 0-30 เสี่ยงสูง</div><div class="gd">เข้าช้าเกินไป หรือ liquidity น้อย — จากข้อมูล: เข้าตอนนี้มักขาดทุน</div></div>
-      </div>
-      <h2><span class="n">3</span>Timeline เข้า/ออก อ่านยังไง</h2>
-      <p>แสดงราคา/กำไรถ้าออกตอนต่างๆ จากซ้ายไปขวา: <b>เข้า → ออกที่ 15 นาที → ออกที่ 30 นาที → พีคสูงสุด → ออกที่ 60 นาที</b> — ดูว่าขายตอนไหนดีที่สุด</p>
-      <h2><span class="n">4</span>ตัวเลขสำคัญที่ต้องรู้</h2>
-      <div class="gloss">
-        <div class="gi"><div class="gt2">ทุน ฿10,000</div><div class="gd">เดิมพันไม้ละ 1% (฿100) ถ้าชนะ +20% ได้ ฿120 ถ้าแพ้ -20% เสีย ฿20 — ไม่มีวันหมดพอร์ตจากเหรียญเดียว</div></div>
-        <div class="gi"><div class="gt2">พีค (Peak)</div><div class="gd">ราคาสูงสุดที่วัดได้หลังเราเจอ "กำไรถ้าขายตอนพีค" = ถ้าขายได้ตอนสูงสุดจะได้เท่าไหร่ (ในความจริงทำได้ยากมาก)</div></div>
-        <div class="gi"><div class="gt2">Trailing Stop -15%</div><div class="gd">ถ้าราคาพุ่ง +50% แล้วร่วงลง 15% = ขายที่ +35% อัตโนมัติ — กลยุทธ์นี้ "ปล่อยให้วิ่งแล้วตัดเมื่อกลับ"</div></div>
-        <div class="gi"><div class="gt2">Entry Pump %</div><div class="gd">ราคาพุ่งไปแล้วกี่% ตอนที่เราเจอเหรียญ — ถ้าน้อย = เราเจอก่อนคนอื่น = โอกาสกำไรมากกว่า</div></div>
-      </div>
-      <h2><span class="n">5</span>ฉันต้องทำอะไรบ้าง</h2>
-      <div class="cll"><b>ตอบสั้นๆ: ไม่ต้องทำอะไร</b> — ระบบทำงานเองทุก 2 นาที เปิดดูแท็บ LAB สัปดาห์ละครั้ง</div>
-      <ul class="cl">
-        <li>ดูแท็บ LAB เช็คว่ากฎกลยุทธ์เปลี่ยนไหมเมื่อมีข้อมูลเพิ่ม</li>
-        <li>ห้ามแก้กลยุทธ์ระหว่างทดสอบ — รอครบ 200 สัญญาณก่อน</li>
-        <li>เมื่อ MemeBot ผ่าน AIRLOCK ค่อยมาออกแบบ v2 ด้วยกัน</li>
-      </ul>
-      <div class="cll dng"><b>⚠ ก่อนใช้เงินจริง:</b> ทุนขั้นต่ำ $2,000 (เหมาะ $10,000+) · ต้องผ่าน AIRLOCK ครบก่อน · เริ่มเล็กเสมอ</div>
-    </div>
-  </section>
-  <footer>PAPER TRADING ONLY · tick ทุก 2 นาที · case study อัปเดตทุก 30 นาที · รีเฟรชทุก 2 นาที · ห้ามแก้กลยุทธ์กลางทาง</footer>
+  <div class="p" id="golden">
+    <div class="pt">⭐ GOLDEN FILTER · รวมทุกกฎ</div>
+    <div class="sub">3 กฎ: pump&lt;20 · อายุ 4-12 ชม. · liquidity ≥ 60k — ยิ่งผ่านครบ ผลยิ่งดี</div>
+    <div class="scroll"><div id="goldenBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
+
+  <div class="p" id="liq">
+    <div class="pt">💧 LIQUIDITY EDGE & DRAIN</div>
+    <div class="sub">edge ที่แท้จริงของ memecoin — ไม่ใช่การเลือก trailing % แต่เป็นการจับ liquidity ไหลออกให้ทันก่อน rug</div>
+    <div id="drainBox"><div class="loading">⟳ กำลังโหลด…</div></div>
+    <div class="pt" style="margin-top:18px;font-size:11.5px">🧱 กำแพง slippage (liquidity edge)</div>
+    <div class="scroll"><div id="edgeBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
+
+  <div class="p" id="rug">
+    <div class="pt">☠️ RUG ESCAPE & HOLD-TIME</div>
+    <div class="sub">หนี rug ได้แค่ไหน + กฎทอง "อย่าถือข้ามวัน"</div>
+    <div class="scroll"><div id="rugBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+    <div class="pt" style="margin-top:18px;font-size:11.5px">⏱ Hold-time curve (ผลเฉลี่ย % ตามเวลาที่ถือ)</div>
+    <div class="scroll"><div id="holdBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
+  </div>
+
+  <div class="p" id="rules">
+    <div class="pt">📜 RULEBOOK · กฎ MemeBot ที่ดีที่สุดเท่าที่ข้อมูลมี</div>
+    <div class="sub">สรุปจากทุกแผงพิสูจน์ — ตัวเลขดึงสดจากฐานข้อมูล อัปเดตเองเมื่อข้อมูลโต</div>
+    <div id="rulesBox"><div class="loading">⟳ กำลังโหลด…</div></div>
+  </div>
+
+  <footer>
+    PORDEE TRADING · STRATEGY PROOF LAB<br>
+    ข้อมูลสดจาก Supabase · อัปเดตอัตโนมัติทุก 2 นาที · <span id="ts">—</span>
+  </footer>
 </div>
+
 <script>
 const SB="https://fkhykyfgykguvpelmdsf.supabase.co";
 const AK="sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA";
 const H={apikey:AK,Authorization:"Bearer "+AK};
 const $=s=>document.querySelector(s);
-const fmt=(n,d=1)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("th-TH",{maximumFractionDigits:d});
-const fB=n=>n==null?"—":"฿"+Math.round(n*100).toLocaleString("th-TH");
-const pp=(n,unit="")=>n==null?"—":(n>0?"+":"")+fmt(n)+unit;
-const hrsAgo=t=>t?(Date.now()-new Date(t))/3600000:null;
-const mAgo=t=>t?Math.round((Date.now()-new Date(t))/60000):null;
+const num=(n,d=1)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("th-TH",{maximumFractionDigits:d});
+const pct=(n,d=1)=>n==null||isNaN(n)?"—":(Number(n)>0?"+":"")+num(n,d)+"%";
+const cls=n=>n==null?"neu":Number(n)>0?"pos":Number(n)<0?"neg":"neu";
+const esc=s=>String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
 async function get(p){
   const r=await fetch(SB+"/rest/v1/"+p,{headers:H});
   if(!r.ok)throw new Error("HTTP "+r.status);
   const t=await r.text();return t?JSON.parse(t):[];
 }
-async function cnt(p){
-  const r=await fetch(SB+"/rest/v1/"+p,{headers:{...H,"Prefer":"count=exact","Range":"0-0"}});
-  return r.headers.get("content-range")?.split("/")[1]||"?";
-}
+function panelErr(id,e){const el=$("#"+id);if(el)el.innerHTML='<div class="err">โหลดไม่สำเร็จ: '+esc(e.message||e)+'</div>';}
 
-function ring(el,eq,col){
-  const r=40,c=2*Math.PI*r;
-  const prog=Math.max(.01,Math.min(1,(eq-50)/100));
-  const cl=eq>=100?"#4DF2B0":(eq>=90?col:"#FF6B7E");
-  el.innerHTML=`<svg width="90" height="90" viewBox="0 0 90 90">
-    <circle cx="45" cy="45" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
-    <circle cx="45" cy="45" r="${r}" fill="none" stroke="${cl}" stroke-width="6" stroke-linecap="round"
-      stroke-dasharray="${c}" stroke-dashoffset="${c*(1-prog)}" style="filter:drop-shadow(0 0 5px ${cl})"/>
-  </svg><div class="rc"><b style="color:${cl}">${fB(eq*100)}</b><s>EQUITY</s></div>`;
-}
-
-function scoreColor(s){return s>=70?"var(--mint)":s>=50?"var(--amber)":s>=30?"var(--orange)":"var(--coral)";}
-function scoreBg(s){return s>=70?"rgba(77,242,176,.12)":s>=50?"rgba(255,194,75,.12)":s>=30?"rgba(255,157,75,.12)":"rgba(255,107,126,.12)";}
-
-async function load(){
-  try{
-    const[sigs,outs,alt,hArr,qual,evts,clog,stratLab,entryLab,scored,strat,perfByVer,v2Air,verCompare,gridData]=await Promise.all([
-      get("meme_signals?select=*&order=scanned_at.desc&limit=300"),
-      get("meme_outcomes?select=*&limit=3000"),
-      get("alt_trades?select=*&order=opened_at.desc&limit=200"),
-      get("system_health?select=*"),
-      get("meme_data_quality?select=*"),
-      get("system_events?select=*&order=created_at.desc&limit=15"),
-      get("meme_case_log?select=*&order=scanned_at.desc&limit=50"),
-      get("exit_strategy_lab?select=*"),
-      get("entry_timing_lab?select=*"),
-      get("signal_with_score?select=*&order=scanned_at.desc&limit=20"),
-      get("strategy_insights?select=*"),
-      get("meme_performance_by_version?select=*"),
-      get("meme_v2_airlock?select=*"),
-      get("meme_version_compare?select=*"),
-      get("strategy_grid_search?select=*&order=net_pnl.desc&limit=10"),
-    ]);
-    const tickC=await cnt("meme_price_ticks");
-    const h=hArr[0]||{};
-    rHealth(h);
-    rMeme(sigs,outs,qual,tickC);
-    rAlt(alt);
-    rFeed(evts);
-    rHints(strat[0]||{},clog,entryLab);
-    rLab(clog,stratLab,entryLab);
-    rAB(verCompare);
-    rGrid(gridData);
-    rScored(scored,outs);
-    setLive(true);
-  }catch(e){setLive(false,e.message);}
-}
-
-
-function rAB(vc){
-  const V=v=>(vc||[]).find(r=>r.version===v)||{};
-  const v1=V('v1'),v2=V('v2'),v3=V('v3');
-  const num=x=>x==null||x===''?null:Number(x);
-  const rows=[
-    {k:'สัญญาณ',         a:v1.signals,        b:v2.signals,        c:v3.signals,        int:true},
-    {k:'path สมบูรณ์',   a:v1.complete_paths, b:v2.complete_paths, c:v3.complete_paths, int:true},
-    {k:'เฉลี่ย h1',      a:num(v1.h1_avg),    b:num(v2.h1_avg),    c:num(v3.h1_avg)},
-    {k:'win rate h1',    a:num(v1.h1_win),    b:num(v2.h1_win),    c:num(v3.h1_win), unit:'%'},
-    {k:'Trailing 25% เฉลี่ย', a:num(v1.trail25_avg), b:num(v2.trail25_avg), c:num(v3.trail25_avg)},
-    {k:'⭐ Trailing 25% net', a:num(v1.trail25_net), b:num(v2.trail25_net), c:num(v3.trail25_net), hero:true},
-    {k:'พีคเฉลี่ย',      a:num(v1.avg_peak),  b:num(v2.avg_peak),  c:num(v3.avg_peak), unit:'%'},
-  ];
-  // verdict จากแถว net (hero)
-  const net={v1:num(v1.trail25_net),v2:num(v2.trail25_net),v3:num(v3.trail25_net)};
-  const v3ready=(v3.complete_paths||0)>0;
-  let verdict, vcls;
-  if(!v3ready){ verdict='⏳ v3 เพิ่งเริ่ม ('+(v3.signals||0)+' สัญญาณ · ยังไม่มี path สมบูรณ์) — ยังตัดสินไม่ได้'; vcls='neu'; }
-  else{
-    const best=Object.entries(net).filter(([,x])=>x!=null).sort((a,b)=>b[1]-a[1])[0];
-    verdict=best?('🏆 ดีสุดตอนนี้: '+best[0].toUpperCase()+' (Trailing 25% net '+pp(best[1],'%')+')'):'—';
-    vcls=best&&best[1]>0?'pos':'neg';
-  }
-  // หา net ที่ดีสุดเพื่อไฮไลต์ช่อง
-  const heroVals=[net.v1,net.v2,net.v3].filter(x=>x!=null);
-  const heroMax=heroVals.length?Math.max(...heroVals):null;
-  const cell=(val,row,isHero)=>{
-    if(val==null) return '<td class="neu">—</td>';
-    const txt=row.int?fmt(val,0):(typeof val==='number'?pp(val,row.unit||'%'):val);
-    let cls=typeof val==='number'&&!row.int?(val>0?'pos':val<0?'neg':'neu'):'';
-    let style='';
-    if(isHero&&heroMax!=null&&val===heroMax){ style='background:rgba(94,202,165,.18);font-weight:700;border:1px solid var(--mint)'; }
-    return `<td class="${cls}" style="${style}">${row.int?fmt(val,0):txt}${isHero&&val===heroMax?' 🏆':''}</td>`;
-  };
-  $("#abCompare").innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-      <span class="${vcls}" style="font-family:var(--mono);font-size:13px;font-weight:700">${verdict}</span>
-    </div>
-    <div class="tw"><table><thead><tr>
-      <th>ตัวชี้วัด</th>
-      <th>v1<br><span style="font-weight:400;font-size:10px;color:var(--dim)">ทุกเหรียญ</span></th>
-      <th style="color:var(--cyan)">v2<br><span style="font-weight:400;font-size:10px;color:var(--dim)">pump&lt;30%</span></th>
-      <th style="color:var(--mint)">v3<br><span style="font-weight:400;font-size:10px;color:var(--dim)">pump&lt;20%+trail25</span></th>
-    </tr></thead><tbody>
-    ${rows.map(r=>`<tr${r.hero?' style="background:rgba(255,255,255,.02)"':''}>
-      <td style="${r.hero?'font-weight:600':''}">${r.k}</td>
-      ${cell(r.a,r,r.hero)}${cell(r.b,r,r.hero)}${cell(r.c,r,r.hero)}
-    </tr>`).join('')}
-    </tbody></table></div>
-    ${!v3ready?`<p style="font-size:10.5px;color:var(--dim);margin-top:8px">⏳ v3 ต้องรอ path ครบ (เหรียญพุ่งแล้วจบรอบ 1 ชม.) อย่างน้อย 5–10 ตัวจึงเทียบได้จริง — ตอนนี้กำลังสะสม</p>`:''}
-  `;
-}
-
-function rGrid(g){
-  const rows=(g||[]).map(r=>({
-    entry:r.entry_rule, exit:r.exit_rule, coins:+r.coins,
-    net:+r.net_pnl, win:+r.win_rate, worst:+r.worst, best:+r.best, drop:+r.net_drop_best
-  }));
-  if(!rows.length){ $("#gridSearch").innerHTML='<div class="loading">ยังไม่มีข้อมูล grid search</div>'; return; }
-  // ทนทานสุด = net_drop_best สูงสุด
-  const robust=rows.reduce((b,r)=>r.drop>b.drop?r:b,rows[0]);
-  const c=v=>v>0?'pos':v<0?'neg':'neu';
-  $("#gridSearch").innerHTML=`
-    <div class="tw"><table><thead><tr>
-      <th>เกณฑ์เข้า</th><th>ออก (trailing)</th><th>เหรียญ</th>
-      <th>net</th><th>win</th><th style="color:var(--mint)">net หักตัวดีสุด</th><th></th>
-    </tr></thead><tbody>
-    ${rows.map(r=>{
-      const isRobust=r===robust;
-      const tough=r.drop>0;
-      return `<tr style="${isRobust?'background:rgba(94,202,165,.12)':''}">
-        <td style="font-family:var(--mono)">${r.entry}</td>
-        <td style="font-family:var(--mono)">${r.exit}</td>
-        <td class="neu">${r.coins}</td>
-        <td class="${c(r.net)}" style="font-weight:600">${pp(r.net,'%')}</td>
-        <td class="neu">${fmt(r.win,0)}%</td>
-        <td class="${c(r.drop)}" style="font-weight:700">${pp(r.drop,'%')}</td>
-        <td>${tough?'<span style="color:var(--mint);font-size:11px">✓ทนทาน</span>':isRobust?'<span style="color:var(--cyan);font-size:11px">ทนสุด</span>':''}</td>
-      </tr>`;
-    }).join('')}
-    </tbody></table></div>
-    <div style="margin-top:10px;padding:10px 12px;border:1px solid var(--mint);border-radius:8px;background:rgba(94,202,165,.06);font-size:11.5px;line-height:1.6">
-      <b style="color:var(--mint)">สรุป robustness:</b> กลยุทธ์ทนทานสุดตอนนี้คือ
-      <b style="font-family:var(--mono)">${robust.entry} + ${robust.exit}</b>
-      (net ${pp(robust.net,'%')} · net หักตัวดีสุด ${pp(robust.drop,'%')})${robust.drop>0
-        ? ' — ทนทานจริง ตัดเหรียญดีสุดออกแล้วยังบวก ✓ ตรงกับที่เลือกทำ v3'
-        : ' — ยังพึ่ง outlier อยู่บ้าง (หักตัวดีสุดแล้วติดลบ) ต้องสะสมเหรียญเพิ่มก่อนยืนยัน'}
-    </div>
-  `;
-}
-
-function setLive(ok,err){
-  const l=$("#ll"),t=$("#lt");
-  if(ok){l.className="led on";t.textContent="LIVE · "+new Date().toLocaleTimeString("th-TH");}
-  else{l.className="led off";t.textContent="OFFLINE";if(err)console.error(err);}
-}
-
-function rHealth(h){
-  const rows=[{k:"SCANNER 🟣",t:h.last_scan,lim:2.5},{k:"OUTCOME 🟣",t:h.last_outcome,lim:1.5},{k:"ALTBOT 🔵",t:h.last_altbot,lim:5}];
-  let html=rows.map(r=>{const hr=hrsAgo(r.t),ok=hr!=null&&hr<r.lim;
-    return`<div class="hc ${ok?'':'bad'}"><div class="hk">${r.k}</div><div class="hv" style="color:${ok?'var(--mint)':'var(--coral)'}">${ok?'ONLINE':'STALE'}</div><div class="ht">${hr==null?'—':fmt(hr*60,0)+' นาทีก่อน'}</div></div>`;}).join('');
-  html+=`<div class="hc ${h.kill_switch?'bad':''}"><div class="hk">KILL SWITCH</div><div class="hv" style="color:${h.kill_switch?'var(--coral)':'var(--mint)'}">${h.kill_switch?'ACTIVE 🛑':'ปิดอยู่'}</div><div class="ht">critical 24ชม.: ${h.critical_24h||0}</div></div>`;
-  $("#hg").innerHTML=html;
-}
-
-function rMeme(sigs,outs,qual,tC){
-  const ok=outs.filter(o=>(o.measure_status||'measured')==='measured');
-  const h1=ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).map(o=>o.pnl_pct).sort((a,b)=>a-b);
-  const w=h1.length?h1.filter(p=>p>0).length/h1.length*100:null;
-  const na=h1.length?h1.reduce((s,x)=>s+x,0)/h1.length-2:null;
-  const med=h1.length?h1[Math.floor(h1.length/2)]:null;
-  let eq=100;ok.filter(o=>o.horizon==='h1'&&o.pnl_pct!=null).forEach(o=>eq+=(o.pnl_pct-2)/100);
-  const totQ=qual.reduce((s,q)=>s+q.n,0);
-  const badQ=qual.filter(q=>q.measure_status!=='measured').reduce((s,q)=>s+q.n,0);
-  const aePct=totQ?badQ/totQ*100:0;
-  $("#ms").textContent=sigs.length;$("#tc").textContent=tC;
-  ring($("#mr"),eq,"#B98CFF");
-  const gates=[
-    {n:"จำนวนสัญญาณ ≥ 200",v:sigs.length+" / 200",p:Math.min(100,sigs.length/2),ok:sigs.length>=200,x:"ต้องเก็บสัญญาณครบ 200 ครั้ง ตัวเลขถึงจะน่าเชื่อถือ"},
-    {n:"อัตราชนะ 1 ชม. > 55%",v:w==null?"ยังไม่มี":fmt(w,0)+"%",p:Math.min(100,(w||0)/55*100),ok:w>55,x:"% เหรียญที่ราคาขึ้นใน 1 ชม.หลังจับ"},
-    {n:"กำไรเฉลี่ยสุทธิ & ค่ากลาง > 0",v:na==null?"ยังไม่มี":pp(na,"%")+" / กลาง "+pp(med,"%"),p:na==null?0:Math.min(100,Math.max(0,50+na*5)),ok:na>0&&med>0,x:"หลังหักค่าธรรมเนียม 2% — ต้องเป็นบวกทั้งคู่"},
-    {n:"ข้อมูลพลาด < 10%",v:fmt(aePct,0)+"% error",p:Math.max(0,100-aePct*10),ok:aePct<10,x:"ถ้าเกิน 10% = infra มีปัญหา ผลสรุปใช้ไม่ได้"},
-  ];
-  $("#mg").innerHTML=gates.map(g=>`<div class="gate"><div class="gt"><div class="gn">${g.ok?'✓ ':''} ${g.n}</div><div class="gv" style="color:${g.ok?'var(--mint)':'var(--amber)'}">${g.v}</div></div><div class="track"><div class="fill ${g.ok?'ok':'vi'}" style="width:${g.p}%"></div></div><div class="gx">${g.x}</div></div>`).join('');
-  const OM={};outs.forEach(o=>{if(!OM[o.signal_id])OM[o.signal_id]={};OM[o.signal_id][o.horizon]=o.pnl_pct;});
-  const tb=$("#mt").querySelector("tbody");
-  if(!sigs.length){tb.innerHTML=`<tr><td colspan="7" class="neu" style="text-align:center;padding:14px">ยังไม่มีสัญญาณ</td></tr>`;return;}
-  tb.innerHTML=sigs.slice(0,20).map(s=>{
-    const p1=OM[s.id]?.h1;
-    const sc=calcScore(s.price_change_h1,s.liquidity_usd,s.age_hours,s.volume_h24);
-    const sl=sc>=70?'🟢 น่าสนใจ':sc>=50?'🟡 พอใช้':sc>=30?'🟠 ระวัง':'🔴 เสี่ยง';
-    return`<tr>
-      <td>${s.symbol||'?'}</td>
-      <td><div style="display:flex;align-items:center;gap:6px">
-        <div style="font-family:var(--mono);font-weight:600;font-size:13px;color:${scoreColor(sc)}">${sc}</div>
-        <div style="height:5px;width:40px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:${sc}%;background:${scoreColor(sc)};border-radius:3px"></div></div>
-        <span style="font-size:10px">${sl.split(' ')[0]}</span>
-      </div></td>
-      <td style="text-align:left;font-size:10px;color:var(--dim)">${s.price_change_h1<30?'เข้าเร็ว ✓':s.price_change_h1<90?'เข้ากลาง':'เข้าช้า ⚠'}</td>
-      <td class="${(s.price_change_h1||0)>30?'neg':'pos'}">${pp(s.price_change_h1,"%")}</td>
-      <td>${s.liquidity_usd?'$'+fmt(s.liquidity_usd,0):'—'}</td>
-      <td class="neu">${fmt(s.age_hours,1)} ชม.</td>
-      <td class="${p1==null?'neu':p1>0?'pos':'neg'}">${p1==null?'—':pp(p1,"%")}</td>
-    </tr>`;}).join('');
-}
-
-function calcScore(pump,liq,age,vol){
-  let s=0;
-  s+=pump<30?35:pump<50?20:pump<90?5:0;
-  s+=liq>=150000?25:liq>=80000?20:liq>=50000?12:5;
-  s+=age>=1&&age<=4?25:age>4&&age<=8?15:age>8&&age<=12?5:0;
-  s+=(vol||0)>=200000?15:(vol||0)>=100000?10:(vol||0)>=50000?5:0;
-  return Math.min(s,100);
-}
-
-function rScored(scored,outs){}
-
-function rAlt(alt){
-  const cl=alt.filter(t=>t.status==='closed'&&t.pnl_pct!=null);
-  const op=alt.filter(t=>t.status==='open');
-  const w=cl.length?cl.filter(t=>t.pnl_pct>0).length/cl.length*100:null;
-  const ws=cl.filter(t=>t.pnl_pct>0).reduce((s,t)=>s+t.pnl_pct,0);
-  const ls=Math.abs(cl.filter(t=>t.pnl_pct<=0).reduce((s,t)=>s+t.pnl_pct,0));
-  const pf=ls>0?ws/ls:(ws>0?9:null);
-  let eq=100;[...cl].sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at)).forEach(t=>eq+=(t.pnl_pct-0.3)/100);
-  $("#at").textContent=cl.length;ring($("#ar"),eq,"#3FE0FF");
-  $("#as").textContent=op.length+" ไม้ถืออยู่ · เป้า 100 เทรด";
-  $("#ags").innerHTML=[["เทรดปิดแล้ว",cl.length+" / 100","var(--ink)"],["อัตราชนะ",w==null?"—":fmt(w,0)+"%","var(--ink)"],["PROFIT FACTOR",pf==null?"—":fmt(pf,2),pf>=1.25?"var(--mint)":"var(--amber)"],["ถืออยู่",op.length,"var(--amber)"]].map(([k,v,c])=>`<div class="cel"><div class="lb2">${k}</div><div class="v" style="color:${c}">${v}</div></div>`).join('');
-  $("#aw").innerHTML=!cl.length&&!op.length?"<b>ทำไมยังไม่มีเทรด?</b> BTC ขาลง AltBot ถือเงินสดรอ — ถูกต้องตามดีไซน์":"<b>สถานะ:</b> เทรดตามจังหวะ BTC";
-  const tb=$("#alt").querySelector("tbody");
-  if(!alt.length){tb.innerHTML=`<tr><td colspan="6" class="neu" style="text-align:center;padding:14px">ยังไม่มีเทรด — BTC ขาลง</td></tr>`;return;}
-  tb.innerHTML=alt.slice(0,12).map(t=>`<tr><td>${t.symbol}</td><td class="neu">${new Date(t.opened_at).toLocaleString("th-TH",{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${t.entry_price}</td><td class="${t.pnl_pct==null?'neu':t.pnl_pct>0?'pos':'neg'}">${t.pnl_pct==null?'—':pp(t.pnl_pct,"%")}</td><td class="neu">${t.exit_reason||'—'}</td><td class="neu" style="font-size:10px">${t.status==='open'?'ถืออยู่':'ปิด'}</td></tr>`).join('');
-}
-
-function rFeed(evts){
-  if(!evts.length){$("#fd").innerHTML=`<div class="neu">ไม่มีข้อมูล</div>`;return;}
-  $("#fd").innerHTML=evts.map(e=>`<div class="r ${e.level}"><span class="src">${e.source}</span><span class="m">${(e.message||'').replace(/</g,'&lt;')}</span><span class="ag">${mAgo(e.created_at)||''}น</span></div>`).join('');
-}
-
-function rHints(si,clog,entryLab){
-  const n=clog.length;
-  if(n<3){
-    $("#hints").innerHTML=`<div class="rule-card"><div class="rule-title">กำลังสะสมข้อมูล</div><div class="rule-body">มี ${n} เหรียญแล้ว ต้องการอีก ${10-n} เหรียญถึงจะเริ่มสรุปกฎได้ — ระบบเก็บราคาทุก 2 นาที คาดว่าได้ข้อมูลพอใน 1-2 สัปดาห์</div></div>`;
-    return;
-  }
-  const earlyCoins=clog.filter(c=>c.entry_pump!=null&&c.entry_pump<30);
-  const lateCoins=clog.filter(c=>c.entry_pump!=null&&c.entry_pump>=30);
-  const earlyAvg=earlyCoins.length?earlyCoins.reduce((s,c)=>s+(c.pnl_h1||0),0)/earlyCoins.length:null;
-  const lateAvg=lateCoins.length?lateCoins.reduce((s,c)=>s+(c.pnl_h1||0),0)/lateCoins.length:null;
-  const peakFast=clog.filter(c=>c.peak_min!=null&&c.peak_min<=30&&c.peak_pct>=20).length;
-  const peakTotal=clog.filter(c=>c.peak_pct>=20).length;
-  const html=[];
-  if(earlyAvg!=null&&lateAvg!=null){
-    const good=earlyAvg>lateAvg;
-    html.push(`<div class="rule-card ${good?'good':'warn'}"><div class="rule-title">📌 กฎ 1: จังหวะเข้า (N=${n})</div><div class="rule-body">${good?`เข้าตอนเหรียญพุ่งยังไม่ถึง +30% → เฉลี่ย <b>${pp(earlyAvg,"%")}</b> ที่ 1 ชม. (N=${earlyCoins.length})<br>เข้าตอนพุ่งแล้ว 30%+ → เฉลี่ย <span class="rb">${pp(lateAvg,"%")}</span> ที่ 1 ชม. (N=${lateCoins.length})<br><b>✅ ข้อมูลบอก: เข้าเร็วดีกว่าชัดเจน</b>`:`ข้อมูลยังไม่ชัดเจนพอ (เข้าเร็ว ${pp(earlyAvg,"%")} vs เข้าช้า ${pp(lateAvg,"%")})`}</div></div>`);
-  }
-  const strats=[{n:"ออก 15 นาที",v:clog.reduce((s,c)=>s+(c.sim_exit_15m||0),0)/clog.length},{n:"ออก 30 นาที",v:clog.reduce((s,c)=>s+(c.sim_exit_30m||0),0)/clog.length},{n:"ออก 60 นาที",v:clog.filter(c=>c.sim_exit_60m!=null).reduce((s,c)=>s+(c.sim_exit_60m||0),0)/Math.max(1,clog.filter(c=>c.sim_exit_60m!=null).length)}];
-  const best=strats.reduce((b,s)=>s.v>b.v?s:b,strats[0]);
-  html.push(`<div class="rule-card good"><div class="rule-title">⏱ กฎ 2: จังหวะออก (N=${n})</div><div class="rule-body">เฉลี่ยทุกเหรียญ:<br>ออกที่ 15 นาที = <b>${pp(strats[0].v,"%")}</b> · ออกที่ 30 นาที = <b>${pp(strats[1].v,"%")}</b> · ออกที่ 60 นาที = <b>${pp(strats[2].v,"%")}</b><br>${best.v>0?`<b>✅ ออกที่ ${best.n} เฉลี่ยดีที่สุด</b>`:'<b>⚠️ ทุกเวลาออกยังติดลบ — ต้องการข้อมูลเพิ่ม</b>'}</div></div>`);
-  if(peakTotal>0){
-    html.push(`<div class="rule-card"><div class="rule-title">🚀 กฎ 3: เหรียญเด้งไว (N=${peakTotal})</div><div class="rule-body">เหรียญที่พีค +20%+ ทั้งหมด ${peakTotal} ตัว · พีคภายใน 30 นาที = ${peakFast} ตัว (${Math.round(peakFast/peakTotal*100)}%)<br>${peakFast>0?`<b>⚠️ พีคส่วนใหญ่ยังไม่ได้อยู่ใน 30 นาทีแรก — ต้องเก็บข้อมูล path สมบูรณ์เพิ่มเติม</b>`:'เหรียญพีคส่วนใหญ่ใช้เวลานานกว่า 30 นาที'}</div></div>`);
-  }
-  $("#hints").innerHTML=html.join('');
-}
-
-function rLab(clog,stratLab,entryLab){
-  // RULES (same as hints)
-  rHints(null,clog,entryLab);
-  const sl=stratLab[0]||{};
-  const coins=sl.coins_complete_path||0;
-  const strats=[
-    {n:"ขายที่ 15 นาที",v:sl["ขายที่ 15 นาที"]},
-    {n:"ขายที่ 30 นาที",v:sl["ขายที่ 30 นาที"]},
-    {n:"ขายที่ 60 นาที",v:sl["ขายที่ 60 นาที"]},
-    {n:"Trailing -15%",v:sl["trailing -15%"]},
-    {n:"Trailing -25%",v:sl["trailing -25%"]},
-    {n:"TP+50 / 60นาที",v:sl["TP+50 หรือ 60นาที"]},
-    {n:"SL-20 / 60นาที",v:sl["SL-20 หรือ 60นาที"]},
-  ].filter(s=>s.v!=null);
-  if(!strats.length||coins<2){
-    $("#sg").innerHTML=`<div style="text-align:center;padding:16px;color:var(--dim);font-size:12px">⏳ กำลังสะสม path สมบูรณ์ (${coins} เหรียญ) — ต้องการอย่างน้อย 5 เหรียญ</div>`;
-  } else {
-    const best=strats.reduce((b,s)=>s.v>b.v?s:b,strats[0]);
-    $("#sg").innerHTML=`<p style="font-size:11px;color:var(--dim);margin-bottom:10px">จาก ${coins} เหรียญ path สมบูรณ์ · พีคเฉลี่ย ${pp(sl["พีคเฉลี่ย"],"%")} ที่นาที ${sl["นาทีถึงพีคเฉลี่ย"]||'—'}</p><div class="sg">${strats.map(s=>`<div class="sc2 ${s.n===best.n?'best':''}"><div class="sn">${s.n}</div><div class="sv" style="color:${s.v>0?'var(--mint)':s.v<0?'var(--coral)':'var(--dim)'}">${pp(s.v,"%")}</div>${s.n===best.n?'<span class="sbest">🏆 ดีสุด</span>':''}</div>`).join('')}</div>`;
-  }
-  // ENTRY
-  if(!entryLab.length){$("#eg").innerHTML=`<div class="loading">ยังไม่มีข้อมูล</div>`;}
-  else{
-    $("#eg").innerHTML=`<div class="tw"><table><thead><tr><th>จังหวะเข้า</th><th>n</th><th>พีคเฉลี่ย</th><th>ขาย 30 นาที</th><th>ขาย 1 ชม.</th><th>โอกาสพีค +20%</th></tr></thead><tbody>${entryLab.map(r=>`<tr><td>${r.จังหวะเข้า}</td><td class="neu">${r.n}</td><td class="${r.พีคเฉลี่ย>20?'pos':'neu'}">${pp(r.พีคเฉลี่ย,"%")}</td><td class="${r.ขาย30นาที>0?'pos':'neg'}">${pp(r.ขาย30นาที,"%")}</td><td class="${r.ขาย1ชม>0?'pos':'neg'}">${pp(r.ขาย1ชม,"%")}</td><td class="${r.มีจังหวะกำไร_pct>=50?'pos':'neu'}">${r.มีจังหวะกำไร_pct||'—'}%</td></tr>`).join('')}</tbody></table></div><p style="font-size:10.5px;color:var(--dim);margin-top:8px">⚠️ N น้อย — อีก 1-2 สัปดาห์ข้อมูลจะน่าเชื่อถือขึ้น</p>`;
-  }
-  // HALL OF FAME
-  const hf=clog.filter(c=>c.peak_pct!=null).sort((a,b)=>b.peak_pct-a.peak_pct);
-  const best3=hf.slice(0,3);
-  const worst3=[...clog].filter(c=>c.pnl_h1!=null).sort((a,b)=>a.pnl_h1-b.pnl_h1).slice(0,3);
-  const mkHof=(c,type)=>{
-    const isGood=type==='best';
-    const icon=isGood?c.peak_pct>=100?'🚀':c.peak_pct>=50?'📈':'✅':c.rugged?'☠️':'🔻';
-    const lesson=isGood
-      ?(c.peak_min<=30?`พีค ${pp(c.peak_pct,"%")} ใน ${c.peak_min} นาที — เข้าตอนพุ่งแค่ ${pp(c.entry_pump,"%")} · ถ้าออกที่ 15 นาที = ${pp(c.sim_exit_15m,"%")}`:`พีค ${pp(c.peak_pct,"%")} แต่ใช้เวลา ${c.peak_min} นาที — ต้องถือนาน`)
-      :(c.rugged?'Liquidity หาย (rug) — ตัวอย่างที่ต้องระวัง':c.entry_pump>50?`เข้าช้า (entry pump ${pp(c.entry_pump,"%")}) — เหรียญพุ่งไปแล้วมาก`:'ไม่มีจังหวะกำไรเลย');
-    return`<div class="hof"><div class="hof-icon">${icon}</div><div class="hof-body"><div class="hof-sym" style="color:${isGood?'var(--mint)':'var(--coral)'}">${c.symbol}</div><div class="hof-stat">เข้า ${c.entry_price} · พีค ${pp(c.peak_pct,"%")} · ผล 1ชม. ${pp(c.pnl_h1,"%")}</div><div class="hof-lesson">${lesson}</div></div></div>`;
-  };
-  $("#hof_best").innerHTML=best3.length?best3.map(c=>mkHof(c,'best')).join(''):`<div class="loading">ยังไม่มีข้อมูล</div>`;
-  $("#hof_worst").innerHTML=worst3.length?worst3.map(c=>mkHof(c,'worst')).join(''):`<div class="loading">ยังไม่มีข้อมูล</div>`;
-  // CASE STUDIES
-  if(!clog.length){$("#cs").innerHTML=`<div class="loading">⟳ กำลังสร้าง case studies…</div>`;return;}
-  $("#cs").innerHTML=clog.slice(0,15).map(c=>{
-    const bc=c.path_complete?'var(--mint)':'var(--amber)';
-    const simR=[['15 นาที',c.exit_price_15m,c.sim_exit_15m],['30 นาที',c.exit_price_30m,c.sim_exit_30m],['60 นาที',c.exit_price_60m,c.sim_exit_60m]];
-    const peak_p=c.tick_high_price;
-    const tl=`<div class="tl">
-      <div class="tl-node entry"><div class="tl-label">เข้า</div><div class="tl-price">${c.entry_price?c.entry_price.toPrecision(4):'-'}</div><div class="tl-pct" style="color:var(--dim)">0%</div></div>
-      ${simR.map(([l,p,pct])=>p?`<span class="tl-arrow">→</span><div class="tl-node ${pct>0?'exit_good':'exit_bad'}"><div class="tl-label">${l}</div><div class="tl-price">${p.toPrecision?p.toPrecision(4):'-'}</div><div class="tl-pct" style="color:${pct>0?'var(--mint)':'var(--coral)'}">${pp(pct,"%")}</div></div>`:'').join('')}
-      ${peak_p?`<span class="tl-arrow">→</span><div class="tl-node peak"><div class="tl-label">พีค</div><div class="tl-price">${peak_p.toPrecision?peak_p.toPrecision(4):'-'}</div><div class="tl-pct" style="color:var(--gold)">${pp(c.peak_pct,"%")}</div></div>`:''}
-    </div>`;
-    const simRows=[['ออก 15 นาที',c.sim_exit_15m],['ออก 30 นาที',c.sim_exit_30m],['ออก 60 นาที',c.sim_exit_60m],['Trailing -15%',c.sim_trail_15],['Trailing -25%',c.sim_trail_25]].filter(([,v])=>v!=null);
-    const bestSim=simRows.length?simRows.reduce((b,r)=>r[1]>b[1]?r:b,simRows[0]):null;
-    return`<div class="cc">
-      <div class="cc-top">
-        <div><div class="cc-sym">${c.symbol}</div><div class="cc-meta">เจอตอนพุ่ง ${pp(c.entry_pump,"%")} · Liq $${fmt(c.liquidity_usd,0)} · ${c.path_complete?'<span style="color:var(--mint)">✓ path ครบ</span>':'<span style="color:var(--amber)">⚠ path ไม่ครบ</span>'} · tick ${c.ticks_n||0}</div></div>
-        <span class="cc-badge" style="background:${bc}22;color:${bc};border:1px solid ${bc}">${c.status==='final'?'✅ บันทึกสมบูรณ์':'⏳ ติดตามอยู่'}</span>
+/* ---------- SAMPLE STATUS ---------- */
+function rSample(d){
+  const s=d[0]; if(!s){$("#sampleBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  const p=Math.max(2,Math.min(100,Number(s.pct_to_target)||0));
+  $("#sampleBox").innerHTML=`
+  <div class="banner">
+    <div class="bmeter">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim)">
+        <span>ความคืบหน้าสู่เป้า ${num(s.target_signals,0)} สัญญาณ</span><span style="color:var(--gold)">${num(s.pct_to_target,0)}%</span>
       </div>
-      ${c.recommendation?`<div class="cc-rec">${c.recommendation}</div>`:''}
-      ${tl}
-      <div class="cc-row">
-        <div class="cs"><div class="ck">พีคสูงสุด</div><div class="cv pos">${pp(c.peak_pct,"%")}</div><div style="font-size:9px;color:var(--dim)">นาที ${c.peak_min||'—'}</div></div>
-        <div class="cs"><div class="ck">ต่ำสุด</div><div class="cv neg">${pp(c.trough_pct,"%")}</div></div>
-        <div class="cs"><div class="ck">ผล 1 ชม.</div><div class="cv ${c.pnl_h1>0?'pos':c.pnl_h1<0?'neg':'neu'}">${pp(c.pnl_h1,"%")}</div></div>
-        ${bestSim?`<div class="cs" style="border:1px solid var(--mint)"><div class="ck">กลยุทธ์ดีสุด</div><div class="cv pos">${pp(bestSim[1],"%")}</div><div style="font-size:9px;color:var(--dim)">${bestSim[0]}</div></div>`:''}
-      </div>
-    </div>`;
-  }).join('');
+      <div class="bbar"><i style="width:${p}%"></i></div>
+      <div style="margin-top:9px;font-size:12px;color:var(--amber)">⚠️ ${esc(s.confidence_level)}</div>
+    </div>
+    <div class="bstats">
+      <div class="bstat"><b>${num(s.complete_paths,0)}</b><s>complete paths</s></div>
+      <div class="bstat"><b class="pos">${num(s.pump20_n,0)}</b><s>pump&lt;20</s></div>
+      <div class="bstat"><b>${num(s.pump30_n,0)}</b><s>pump&lt;30</s></div>
+      <div class="bstat"><b class="neg">${num(s.rugs_seen,0)}</b><s>rug ที่เห็น</s></div>
+    </div>
+  </div>`;
 }
 
-document.querySelectorAll(".tab").forEach(t=>{
-  t.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active","tc","tv","tm","to","tg"));
-    const map={ov:'tc',mm:'tv',ab:'tm',lb:'to',mn:'tg'};
-    t.classList.add("active",map[t.dataset.tab]);
-    ["ov","mm","ab","lb","mn"].forEach(id=>document.getElementById("tab-"+id).classList.toggle("hidden",id!==t.dataset.tab));
+/* ---------- VERSION COMPARE ---------- */
+function rVer(d){
+  if(!d.length){$("#verBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  d.sort((a,b)=>String(a.version).localeCompare(String(b.version)));
+  let best=-1e9,bi=-1; d.forEach((r,i)=>{if(r.trail25_net!=null&&Number(r.trail25_net)>best){best=Number(r.trail25_net);bi=i;}});
+  let h=`<table><thead><tr><th>เวอร์ชัน</th><th>สัญญาณ</th><th>path ครบ</th><th>h1 avg</th><th>h1 win</th><th>Trail25 net ⭐</th><th>peak avg</th></tr></thead><tbody>`;
+  d.forEach((r,i)=>{
+    h+=`<tr${i===bi?' class="star"':''}>
+      <td><b>${esc(r.version)}</b><div style="font-size:10px;color:var(--dim);font-weight:400">${esc(r.note||"")}</div></td>
+      <td>${num(r.signals,0)}</td><td>${num(r.complete_paths,0)}</td>
+      <td class="${cls(r.h1_avg)}">${pct(r.h1_avg)}</td>
+      <td>${num(r.h1_win,0)}%</td>
+      <td class="${i===bi?'starcell':cls(r.trail25_net)}">${pct(r.trail25_net)}${i===bi?' ⭐':''}</td>
+      <td>${pct(r.avg_peak)}</td></tr>`;
   });
-});
+  h+=`</tbody></table>`;
+  const bv=d[bi];
+  if(bv) h+=`<div class="callout">⭐ ผู้ชนะตอนนี้: <b>${esc(bv.version)}</b> — Trailing 25% net <b>${pct(bv.trail25_net)}</b> (h1 win ${num(bv.h1_win,0)}%) แต่ path ครบเพิ่งมี ${num(bv.complete_paths,0)} ตัว ${Number(bv.complete_paths)<10?'→ <b>ยังตัดสินไม่ได้</b> ต้องสะสมเพิ่ม':''}</div>`;
+  $("#verBox").innerHTML=h;
+}
 
-setInterval(()=>$("#ck").textContent=new Date().toLocaleTimeString("th-TH"),1000);
-load();setInterval(load,120000);
-</script></body></html>
+/* ---------- V5 LIQUIDITY GUARD ---------- */
+function rGuard(d){
+  if(!d.length){$("#guardBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<table><thead><tr><th>กลุ่ม</th><th>เหรียญ</th><th>ถือ h1</th><th>trail 30%</th><th>liq-guard 15%</th><th>guard vs trail</th><th>guard บน rug</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.grp)}</b></td><td>${num(r.coins,0)}</td>
+      <td class="${cls(r.hold_h1)}">${pct(r.hold_h1)}</td>
+      <td class="${cls(r.trail30)}">${pct(r.trail30)}</td>
+      <td class="${cls(r.liq_guard)}">${pct(r.liq_guard)}</td>
+      <td class="${cls(r.liq_vs_trail)}">${pct(r.liq_vs_trail)}</td>
+      <td class="${cls(r.liq_guard_on_rugs)}">${r.liq_guard_on_rugs==null?'—':pct(r.liq_guard_on_rugs)}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#guardBox").innerHTML=h;
+}
+function rGuardCoin(d){
+  if(!d.length){$("#guardCoinBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<table><thead><tr><th>เหรียญ</th><th>entry pump</th><th>liq หาย</th><th>ถ้าถือ (h1)</th><th>liq-exit</th><th>trail 30%</th><th>guard ช่วย</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.symbol)}</b></td>
+      <td>${pct(r.entry_pump,0)}</td>
+      <td class="${Number(r.liq_drained_pct)<-50?'neg':'neu'}">${pct(r.liq_drained_pct,0)}</td>
+      <td class="${cls(r.pnl_h1)}">${pct(r.pnl_h1)}</td>
+      <td class="${cls(r.sim_liq_exit)}">${pct(r.sim_liq_exit)}</td>
+      <td class="${cls(r.sim_trail_30)}">${pct(r.sim_trail_30)}</td>
+      <td class="${cls(r.guard_saved)}"><b>${pct(r.guard_saved)}</b></td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#guardCoinBox").innerHTML=h;
+}
+
+/* ---------- GRID SEARCH ---------- */
+function rGrid(d){
+  if(!d.length){$("#gridBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let robust=d.filter(r=>Number(r.net_drop_best)>0).sort((a,b)=>Number(b.net_drop_best)-Number(a.net_drop_best))[0];
+  let h=`<table><thead><tr><th>เกณฑ์เข้า</th><th>ทางออก</th><th>เหรียญ</th><th>net</th><th>win</th><th>worst</th><th>net หักตัวดีสุด</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    const robustOk=Number(r.net_drop_best)>0;
+    h+=`<tr${robust&&r===robust?' class="star"':''}>
+      <td><b>${esc(r.entry_rule)}</b></td><td>${esc(r.exit_rule)}</td>
+      <td>${num(r.coins,0)}</td>
+      <td class="${cls(r.net_pnl)}">${pct(r.net_pnl)}</td>
+      <td>${num(r.win_rate,0)}%</td>
+      <td class="neg">${pct(r.worst)}</td>
+      <td class="${cls(r.net_drop_best)}">${pct(r.net_drop_best)} ${robustOk?'<span class="tag win">✓ทน</span>':''}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  if(robust) h+=`<div class="callout">🏆 ทนทานที่สุด (net ยังบวกแม้ตัดเหรียญดีสุดออก): <b>${esc(robust.entry_rule)} + ${esc(robust.exit_rule)}</b> — net หักตัวดีสุด <b>${pct(robust.net_drop_best)}</b>, win ${num(robust.win_rate,0)}%, N=${num(robust.coins,0)}</div>`;
+  else h+=`<div class="callout">⚠️ <b>ยังไม่มีกลยุทธ์ใดที่ net หักตัวดีสุดเป็นบวก</b> — แปลว่าทุกกลยุทธ์ยังพึ่ง outlier อยู่ ต้องสะสมเหรียญเพิ่มก่อนยืนยัน</div>`;
+  $("#gridBox").innerHTML=h;
+}
+
+/* ---------- GOLDEN FILTER ---------- */
+function rGolden(d){
+  if(!d.length){$("#goldenBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<table><thead><tr><th>ระดับ</th><th>เหรียญ</th><th>pump avg</th><th>liq avg</th><th>peak avg</th><th>h1 avg</th><th>win</th><th>rug</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.filter_level)}</b></td>
+      <td>${num(r.coins,0)}</td>
+      <td>${pct(r.avg_pump,0)}</td>
+      <td>$${num(r.avg_liq,0)}</td>
+      <td class="${cls(r.avg_peak)}">${pct(r.avg_peak,0)}</td>
+      <td class="${cls(r.avg_h1)}">${pct(r.avg_h1)}</td>
+      <td>${num(r.win_rate,0)}%</td>
+      <td class="${Number(r.rugs)>0?'neg':'pos'}">${num(r.rugs,0)}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#goldenBox").innerHTML=h;
+}
+
+/* ---------- LIQUIDITY DRAIN + EDGE ---------- */
+function rDrain(d){
+  if(!d.length){$("#drainBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<div class="cards">`;
+  d.forEach(r=>{
+    const c=Number(r.avg_pnl)>20?'var(--mint)':Number(r.avg_pnl)<-30?'var(--coral)':'var(--amber)';
+    h+=`<div class="card"><h4>${esc(r.liq_trend)}</h4>
+      <div class="big" style="color:${c}">${pct(r.avg_pnl,0)}</div>
+      <div class="meta">${num(r.coins,0)} เหรียญ · win ${num(r.win_rate,0)}%</div></div>`;
+  });
+  h+=`</div><div class="callout">💡 <b>edge จริง:</b> liquidity กำลังไหลออก = ตายเกือบแน่ (win 0%) · liquidity เพิ่มขึ้น = ชนะเกือบ 100% — ถ้าเฝ้า liq real-time แล้วขายทันทีที่เริ่มหาย จะหนี rug ได้เกือบทุกตัว</div>`;
+  $("#drainBox").innerHTML=h;
+}
+function rEdge(d){
+  if(!d.length){$("#edgeBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<table><thead><tr><th>ระดับ liq</th><th>เหรียญ</th><th>slippage</th><th>trail30 (ดิบ)</th><th>trail30 (จริง)</th><th>win จริง</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.liq_tier)}</b></td><td>${num(r.coins,0)}</td>
+      <td class="neg">-${num(r.slip_rt)}%</td>
+      <td class="${cls(r.trail30_naive)}">${pct(r.trail30_naive)}</td>
+      <td class="${cls(r.trail30_real)}">${pct(r.trail30_real)}</td>
+      <td>${num(r.win_real,0)}%</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#edgeBox").innerHTML=h;
+}
+
+/* ---------- RUG ESCAPE + HOLDTIME ---------- */
+function rRug(d){
+  if(!d.length){$("#rugBox").innerHTML='<div class="err">ยังไม่มีเคส rug</div>';return;}
+  let h=`<table><thead><tr><th>ประเภท rug</th><th>เหรียญ</th><th>entry pump</th><th>นาทีก่อนร่วง</th><th>ออก 15%</th><th>trail 25%</th><th>ถือยาว</th><th>trail ช่วย</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.rug_type)}</b></td><td>${num(r.coins,0)}</td>
+      <td>${pct(r.avg_entry_pump,0)}</td><td>${num(r.avg_min_to_crash,0)}</td>
+      <td class="${cls(r.exit15_result)}">${pct(r.exit15_result)}</td>
+      <td class="${cls(r.trail25_result)}">${pct(r.trail25_result)}</td>
+      <td class="${cls(r.hold_result)}">${pct(r.hold_result)}</td>
+      <td class="${cls(r.trail_saved)}">${pct(r.trail_saved)}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#rugBox").innerHTML=h;
+}
+function rHold(d){
+  if(!d.length){$("#holdBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
+  let h=`<table><thead><tr><th>กลุ่ม</th><th>เหรียญ</th><th>15น</th><th>30น</th><th>60น</th><th>1ชม</th><th>6ชม</th><th>24ชม</th></tr></thead><tbody>`;
+  d.forEach(r=>{
+    h+=`<tr><td><b>${esc(r.grp)}</b></td><td>${num(r.coins,0)}</td>
+      <td class="${cls(r.t15m)}">${pct(r.t15m)}</td>
+      <td class="${cls(r.t30m)}">${pct(r.t30m)}</td>
+      <td class="${cls(r.t60m)}">${pct(r.t60m)}</td>
+      <td class="${cls(r.h1)}">${pct(r.h1)}</td>
+      <td class="${cls(r.h6)}">${pct(r.h6)}</td>
+      <td class="${cls(r.h24)}"><b>${pct(r.h24)}</b></td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  $("#holdBox").innerHTML=h;
+}
+
+/* ---------- RULEBOOK (derived live) ---------- */
+function rRules(ctx){
+  const golden=(ctx.golden||[]).find(r=>String(r.filter_level).includes("2/3"))||{};
+  const drainRug=(ctx.drain||[]).find(r=>String(r.liq_trend).includes("รug")||String(r.liq_trend).includes(">50"))||(ctx.drain||[])[0]||{};
+  const drainUp=(ctx.drain||[]).find(r=>String(r.liq_trend).includes("เพิ่ม"))||{};
+  const hold=(ctx.hold||[]).find(r=>r.grp==="pump<20")||{};
+  const sample=(ctx.sample||[])[0]||{};
+  const robust=(ctx.grid||[]).filter(r=>Number(r.net_drop_best)>0).sort((a,b)=>Number(b.net_drop_best)-Number(a.net_drop_best))[0];
+
+  let h=`
+  <div class="rb">
+    <h3>เข้า · ENTRY</h3>
+    <div class="rule">pump &lt; 20% + อายุ 4-12 ชม. + liquidity ≥ 60k</div>
+    <div class="ev">ผ่าน 2/3 กฎ → win <b>${num(golden.win_rate,0)}%</b>, h1 avg <b>${pct(golden.avg_h1)}</b>, rug <b>${num(golden.rugs,0)}</b> ตัว · ยิ่งผ่านครบ ผลยิ่งดี</div>
+  </div>
+  <div class="rb exit">
+    <h3>ออก · EXIT</h3>
+    <div class="rule">trailing stop 30% — หรือ liquidity-guard: ขายทันทีที่ liq หาย &gt;15%</div>
+    <div class="ev">${robust?`grid search ตัวทนสุด: <b>${esc(robust.entry_rule)} + ${esc(robust.exit_rule)}</b> (net หักตัวดีสุด ${pct(robust.net_drop_best)})`:'⚠️ ยังไม่มีกลยุทธ์ใด robust พอ (net หักตัวดีสุดยังไม่บวก)'}</div>
+  </div>
+  <div class="rb avoid">
+    <h3>เลี่ยง · AVOID</h3>
+    <div class="rule">เหรียญที่ liquidity กำลังไหลออก = ตายแน่ (rug zone)</div>
+    <div class="ev">liq หาย &gt;50% → ผลเฉลี่ย <b>${pct(drainRug.avg_pnl,0)}</b>, win <b>${num(drainRug.win_rate,0)}%</b> · ตรงข้าม liq เพิ่ม &gt;20% → <b>${pct(drainUp.avg_pnl,0)}</b>, win <b>${num(drainUp.win_rate,0)}%</b></div>
+  </div>
+  <div class="rb never">
+    <h3>ห้ามเด็ดขาด · NEVER</h3>
+    <div class="rule">อย่าถือ memecoin เกิน 6 ชม.</div>
+    <div class="ev">pump&lt;20 ถือ 24 ชม. → <b>${pct(hold.h24)}</b> (หายนะ) · จุดคุ้มสุดคือออกภายใน 1-6 ชม.</div>
+  </div>
+  <div class="note">📌 ความเชื่อมั่นปัจจุบัน: complete path <b>${num(sample.complete_paths,0)}/${num(sample.target_signals,0)}</b> (${num(sample.pct_to_target,0)}%) · ${esc(sample.confidence_level||"")} — กฎเหล่านี้คือ "ดีที่สุดเท่าที่ข้อมูลมี" ปล่อยให้ v3/v5 เก็บถึง 50-100 เหรียญแล้วเช็กซ้ำ ถ้ากฎยังเหมือนเดิม = ของจริง</div>`;
+  $("#rulesBox").innerHTML=h;
+}
+
+/* ---------- LOAD ---------- */
+async function load(){
+  const ctx={};
+  const tasks=[
+    ["proof_sample_status?select=*","sample",rSample,"sampleBox"],
+    ["meme_version_compare?select=*","ver",rVer,"verBox"],
+    ["proof_liquidity_guard?select=*","guard",rGuard,"guardBox"],
+    ["proof_liq_guard_per_coin?select=*&order=guard_saved.desc.nullslast&limit=15","guardcoin",rGuardCoin,"guardCoinBox"],
+    ["strategy_grid_search?select=*&order=net_pnl.desc&limit=12","grid",rGrid,"gridBox"],
+    ["proof_golden_filter?select=*","golden",rGolden,"goldenBox"],
+    ["proof_liquidity_drain?select=*","drain",rDrain,"drainBox"],
+    ["proof_liquidity_edge?select=*","edge",rEdge,"edgeBox"],
+    ["analysis_rug_escape?select=*","rug",rRug,"rugBox"],
+    ["proof_holdtime_curve?select=*","hold",rHold,"holdBox"],
+  ];
+  let ok=0;
+  await Promise.all(tasks.map(async([path,key,fn,box])=>{
+    try{const d=await get(path);ctx[key]=d;fn(d);ok++;}
+    catch(e){panelErr(box,e);}
+  }));
+  try{rRules(ctx);}catch(e){panelErr("rulesBox",e);}
+  $("#liveTxt").textContent=ok+"/"+tasks.length+" แผง · LIVE";
+  $("#ts").textContent=new Date().toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"});
+}
+load();
+setInterval(load,120000);
+</script>
+</body>
+</html>
