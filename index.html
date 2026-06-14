@@ -245,10 +245,17 @@ footer{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);t
     </div>
     
     <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
-      <div class="pt"><span class="b"></span>🆚 เปรียบเทียบ v1 vs v2 · A/B TEST
-        <span class="info">i<span class="tip">v1 = จับทุกเหรียญ | v2 = จับเฉพาะเหรียญพุ่งยังไม่ถึง +30% — ถ้า v2 ชนะ v1 ชัดเจนที่ 200 สัญญาณ = v2 คือกลยุทธ์ใหม่</span></span>
+      <div class="pt"><span class="b"></span>🆚 เปรียบเทียบกลยุทธ์ v1 · v2 · v3 · A/B TEST
+        <span class="info">i<span class="tip">v1 = จับทุกเหรียญ ไม่มี trailing | v2 = กรอง pump&lt;30% | v3 = กรอง pump&lt;20% + trailing stop 25% (ผู้ชนะ robust จาก grid search) — ตัวชี้วัดสำคัญสุดคือ "Trailing 25% net" หลังหัก fee</span></span>
       </div>
       <div id="abCompare"><div class="loading">⟳ กำลังโหลด…</div></div>
+    </div>
+    <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+      <div class="pt"><span class="b"></span>🔬 GRID SEARCH · ค้นหากลยุทธ์ดีสุดจากข้อมูลจริง
+        <span class="info">i<span class="tip">ทดสอบทุกคอมโบ (เกณฑ์เข้า × trailing stop) จาก path ราคาจริง — คอลัมน์ "net หักตัวดีสุด" = ผลถ้าตัดเหรียญที่ดีสุดออก 1 ตัว ถ้ายังบวก = ทนทานจริงไม่ใช่ฟลุกจากเหรียญเดียว</span></span>
+      </div>
+      <p style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6">net = กำไรเฉลี่ยต่อเหรียญหลังหัก fee 2% · <b style="color:var(--mint)">net หักตัวดีสุด</b> = ตัวชี้วัดความทนทาน (robustness) ยิ่งสูงยิ่งพึ่งพาได้</p>
+      <div id="gridSearch"><div class="loading">⟳ กำลังโหลด…</div></div>
     </div>
     <div class="p"><span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
       <div class="pt"><span class="b"></span>⏱ จังหวะเข้าที่ดีที่สุด · ENTRY TIMING</div>
@@ -345,7 +352,7 @@ function scoreBg(s){return s>=70?"rgba(77,242,176,.12)":s>=50?"rgba(255,194,75,.
 
 async function load(){
   try{
-    const[sigs,outs,alt,hArr,qual,evts,clog,stratLab,entryLab,scored,strat,perfByVer,v2Air]=await Promise.all([
+    const[sigs,outs,alt,hArr,qual,evts,clog,stratLab,entryLab,scored,strat,perfByVer,v2Air,verCompare,gridData]=await Promise.all([
       get("meme_signals?select=*&order=scanned_at.desc&limit=300"),
       get("meme_outcomes?select=*&limit=3000"),
       get("alt_trades?select=*&order=opened_at.desc&limit=200"),
@@ -359,6 +366,8 @@ async function load(){
       get("strategy_insights?select=*"),
       get("meme_performance_by_version?select=*"),
       get("meme_v2_airlock?select=*"),
+      get("meme_version_compare?select=*"),
+      get("strategy_grid_search?select=*&order=net_pnl.desc&limit=10"),
     ]);
     const tickC=await cnt("meme_price_ticks");
     const h=hArr[0]||{};
@@ -368,48 +377,102 @@ async function load(){
     rFeed(evts);
     rHints(strat[0]||{},clog,entryLab);
     rLab(clog,stratLab,entryLab);
-    rAB(perfByVer,v2Air);
+    rAB(verCompare);
+    rGrid(gridData);
     rScored(scored,outs);
     setLive(true);
   }catch(e){setLive(false,e.message);}
 }
 
 
-function rAB(perfByVer, v2Air){
-  const v1h1=perfByVer.find(r=>r.version==='v1'&&r.horizon==='h1');
-  const v2h1=perfByVer.find(r=>r.version==='v2'&&r.horizon==='h1');
-  const v2a=v2Air&&v2Air[0]||{};
-  const v2Sigs=v2a.signals||0;
-  const cols=[
-    {k:'สัญญาณ',v1:v1h1?.n||0,v2:v2Sigs},
-    {k:'เฉลี่ย h1',v1:v1h1?.avg_pnl,v2:v2h1?.avg_pnl},
-    {k:'net avg (หัก2%)',v1:v1h1?.net_avg,v2:v2h1?.net_avg},
-    {k:'ค่ากลาง',v1:v1h1?.median,v2:v2h1?.median},
-    {k:'win rate',v1:v1h1?v1h1.win_pct+'%':null,v2:v2h1?v2h1.win_pct+'%':null},
+function rAB(vc){
+  const V=v=>(vc||[]).find(r=>r.version===v)||{};
+  const v1=V('v1'),v2=V('v2'),v3=V('v3');
+  const num=x=>x==null||x===''?null:Number(x);
+  const rows=[
+    {k:'สัญญาณ',         a:v1.signals,        b:v2.signals,        c:v3.signals,        int:true},
+    {k:'path สมบูรณ์',   a:v1.complete_paths, b:v2.complete_paths, c:v3.complete_paths, int:true},
+    {k:'เฉลี่ย h1',      a:num(v1.h1_avg),    b:num(v2.h1_avg),    c:num(v3.h1_avg)},
+    {k:'win rate h1',    a:num(v1.h1_win),    b:num(v2.h1_win),    c:num(v3.h1_win), unit:'%'},
+    {k:'Trailing 25% เฉลี่ย', a:num(v1.trail25_avg), b:num(v2.trail25_avg), c:num(v3.trail25_avg)},
+    {k:'⭐ Trailing 25% net', a:num(v1.trail25_net), b:num(v2.trail25_net), c:num(v3.trail25_net), hero:true},
+    {k:'พีคเฉลี่ย',      a:num(v1.avg_peak),  b:num(v2.avg_peak),  c:num(v3.avg_peak), unit:'%'},
   ];
-  const v2Win=v2h1&&v1h1&&v2h1.net_avg>v1h1.net_avg;
-  const badge=v2Sigs<10?'⏳ สะสมข้อมูล':v2Win?'🟢 v2 ดีกว่า v1':'🟡 ยังไม่ชัดเจน';
+  // verdict จากแถว net (hero)
+  const net={v1:num(v1.trail25_net),v2:num(v2.trail25_net),v3:num(v3.trail25_net)};
+  const v3ready=(v3.complete_paths||0)>0;
+  let verdict, vcls;
+  if(!v3ready){ verdict='⏳ v3 เพิ่งเริ่ม ('+(v3.signals||0)+' สัญญาณ · ยังไม่มี path สมบูรณ์) — ยังตัดสินไม่ได้'; vcls='neu'; }
+  else{
+    const best=Object.entries(net).filter(([,x])=>x!=null).sort((a,b)=>b[1]-a[1])[0];
+    verdict=best?('🏆 ดีสุดตอนนี้: '+best[0].toUpperCase()+' (Trailing 25% net '+pp(best[1],'%')+')'):'—';
+    vcls=best&&best[1]>0?'pos':'neg';
+  }
+  // หา net ที่ดีสุดเพื่อไฮไลต์ช่อง
+  const heroVals=[net.v1,net.v2,net.v3].filter(x=>x!=null);
+  const heroMax=heroVals.length?Math.max(...heroVals):null;
+  const cell=(val,row,isHero)=>{
+    if(val==null) return '<td class="neu">—</td>';
+    const txt=row.int?fmt(val,0):(typeof val==='number'?pp(val,row.unit||'%'):val);
+    let cls=typeof val==='number'&&!row.int?(val>0?'pos':val<0?'neg':'neu'):'';
+    let style='';
+    if(isHero&&heroMax!=null&&val===heroMax){ style='background:rgba(94,202,165,.18);font-weight:700;border:1px solid var(--mint)'; }
+    return `<td class="${cls}" style="${style}">${row.int?fmt(val,0):txt}${isHero&&val===heroMax?' 🏆':''}</td>`;
+  };
   $("#abCompare").innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-      <span style="font-family:var(--mono);font-size:13px;font-weight:600">${badge}</span>
-      <span style="font-size:11px;color:var(--dim)">v2 = จับเฉพาะ pump <30%</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="${vcls}" style="font-family:var(--mono);font-size:13px;font-weight:700">${verdict}</span>
     </div>
     <div class="tw"><table><thead><tr>
       <th>ตัวชี้วัด</th>
-      <th>v1 (ทุกเหรียญ)</th>
-      <th style="color:var(--cyan)">v2 (pump &lt;30% เท่านั้น)</th>
+      <th>v1<br><span style="font-weight:400;font-size:10px;color:var(--dim)">ทุกเหรียญ</span></th>
+      <th style="color:var(--cyan)">v2<br><span style="font-weight:400;font-size:10px;color:var(--dim)">pump&lt;30%</span></th>
+      <th style="color:var(--mint)">v3<br><span style="font-weight:400;font-size:10px;color:var(--dim)">pump&lt;20%+trail25</span></th>
     </tr></thead><tbody>
-    ${cols.map(c=>{
-      const v1ok=c.v1!=null,v2ok=c.v2!=null;
-      const v2better=typeof c.v1==='number'&&typeof c.v2==='number'&&c.v2>c.v1;
-      return `<tr>
-        <td>${c.k}</td>
-        <td class="${typeof c.v1==='number'?c.v1>0?'pos':'neg':'neu'}">${c.v1==null?'—':typeof c.v1==='number'?pp(c.v1,'%'):c.v1}</td>
-        <td class="${v2better?'pos':typeof c.v2==='number'?c.v2>0?'pos':'neg':'neu'}" style="font-weight:600">${c.v2==null?'—':typeof c.v2==='number'?pp(c.v2,'%'):c.v2}${v2better?' ✓':''}</td>
+    ${rows.map(r=>`<tr${r.hero?' style="background:rgba(255,255,255,.02)"':''}>
+      <td style="${r.hero?'font-weight:600':''}">${r.k}</td>
+      ${cell(r.a,r,r.hero)}${cell(r.b,r,r.hero)}${cell(r.c,r,r.hero)}
+    </tr>`).join('')}
+    </tbody></table></div>
+    ${!v3ready?`<p style="font-size:10.5px;color:var(--dim);margin-top:8px">⏳ v3 ต้องรอ path ครบ (เหรียญพุ่งแล้วจบรอบ 1 ชม.) อย่างน้อย 5–10 ตัวจึงเทียบได้จริง — ตอนนี้กำลังสะสม</p>`:''}
+  `;
+}
+
+function rGrid(g){
+  const rows=(g||[]).map(r=>({
+    entry:r.entry_rule, exit:r.exit_rule, coins:+r.coins,
+    net:+r.net_pnl, win:+r.win_rate, worst:+r.worst, best:+r.best, drop:+r.net_drop_best
+  }));
+  if(!rows.length){ $("#gridSearch").innerHTML='<div class="loading">ยังไม่มีข้อมูล grid search</div>'; return; }
+  // ทนทานสุด = net_drop_best สูงสุด
+  const robust=rows.reduce((b,r)=>r.drop>b.drop?r:b,rows[0]);
+  const c=v=>v>0?'pos':v<0?'neg':'neu';
+  $("#gridSearch").innerHTML=`
+    <div class="tw"><table><thead><tr>
+      <th>เกณฑ์เข้า</th><th>ออก (trailing)</th><th>เหรียญ</th>
+      <th>net</th><th>win</th><th style="color:var(--mint)">net หักตัวดีสุด</th><th></th>
+    </tr></thead><tbody>
+    ${rows.map(r=>{
+      const isRobust=r===robust;
+      const tough=r.drop>0;
+      return `<tr style="${isRobust?'background:rgba(94,202,165,.12)':''}">
+        <td style="font-family:var(--mono)">${r.entry}</td>
+        <td style="font-family:var(--mono)">${r.exit}</td>
+        <td class="neu">${r.coins}</td>
+        <td class="${c(r.net)}" style="font-weight:600">${pp(r.net,'%')}</td>
+        <td class="neu">${fmt(r.win,0)}%</td>
+        <td class="${c(r.drop)}" style="font-weight:700">${pp(r.drop,'%')}</td>
+        <td>${tough?'<span style="color:var(--mint);font-size:11px">✓ทนทาน</span>':isRobust?'<span style="color:var(--cyan);font-size:11px">ทนสุด</span>':''}</td>
       </tr>`;
     }).join('')}
     </tbody></table></div>
-    ${v2Sigs<30?`<p style="font-size:10.5px;color:var(--dim);margin-top:8px">⏳ v2 มีสัญญาณแค่ ${v2Sigs} ตัว — ต้องการอย่างน้อย 30+ เพื่อสรุปผลได้</p>`:''}
+    <div style="margin-top:10px;padding:10px 12px;border:1px solid var(--mint);border-radius:8px;background:rgba(94,202,165,.06);font-size:11.5px;line-height:1.6">
+      <b style="color:var(--mint)">สรุป robustness:</b> กลยุทธ์ทนทานสุดตอนนี้คือ
+      <b style="font-family:var(--mono)">${robust.entry} + ${robust.exit}</b>
+      (net ${pp(robust.net,'%')} · net หักตัวดีสุด ${pp(robust.drop,'%')})${robust.drop>0
+        ? ' — ทนทานจริง ตัดเหรียญดีสุดออกแล้วยังบวก ✓ ตรงกับที่เลือกทำ v3'
+        : ' — ยังพึ่ง outlier อยู่บ้าง (หักตัวดีสุดแล้วติดลบ) ต้องสะสมเหรียญเพิ่มก่อนยืนยัน'}
+    </div>
   `;
 }
 
