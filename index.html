@@ -3,152 +3,335 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pordee Trading — Dashboard</title>
+<title>Pordee Engine — Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b0e14;--card:#131722;--card2:#0f131c;--bd:#232838;--tx:#e6e9ef;--mut:#8b93a7;
-    --grn:#16c784;--red:#ea3943;--amb:#f0b90b;--acc:#5b8def;
+    --bg:#070A12; --bg2:#0A0F1C;
+    --panel:#0E1320; --panel2:#121A2B; --raised:#16203440;
+    --line:#1E2840; --line2:#2A375A;
+    --tx:#E8ECF6; --mut:#7E8AA6; --mut2:#566286;
+    --teal:#5EE9D6; --peri:#6E8BFF; --jade:#3FD8A4; --coral:#FF5C7A; --amber:#FFC24B;
+    --glowteal:rgba(94,233,214,.5); --glowperi:rgba(110,139,255,.45);
+    --disp:'Space Grotesk','Noto Sans Thai',sans-serif;
+    --body:'Inter','Noto Sans Thai',sans-serif;
+    --mono:'JetBrains Mono','Noto Sans Thai',monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;font-size:14px;line-height:1.5}
-  .wrap{max-width:1100px;margin:0 auto;padding:14px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-  h1{font-size:17px;margin:0;letter-spacing:.3px}
-  .sub{color:var(--mut);font-size:12px}
-  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px}
-  .b-live{background:rgba(234,57,67,.15);color:var(--red);border:1px solid var(--red)}
-  .b-dry{background:rgba(91,141,239,.15);color:var(--acc);border:1px solid var(--acc)}
-  .b-kill{background:rgba(240,185,11,.15);color:var(--amb);border:1px solid var(--amb)}
-  nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;position:sticky;top:0;background:var(--bg);z-index:5}
-  nav button{flex:0 0 auto;background:var(--card);border:1px solid var(--bd);color:var(--mut);padding:7px 13px;border-radius:9px;cursor:pointer;font-size:13px}
-  nav button.active{color:var(--tx);border-color:var(--acc);background:rgba(91,141,239,.12)}
-  section{display:none}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--tx); font-family:var(--body); font-size:14px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1100px 600px at 12% -8%, rgba(110,139,255,.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(94,233,214,.08), transparent 55%);
+    background-attachment:fixed;
+  }
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* ---------- shell ---------- */
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+  .rail{
+    border-right:1px solid var(--line); padding:22px 16px; position:sticky; top:0; height:100vh;
+    display:flex; flex-direction:column; gap:6px; background:linear-gradient(180deg,var(--bg2),transparent);
+  }
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:22px;padding:0 6px}
+  .brand .logo{
+    width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+    background:conic-gradient(from 200deg,var(--peri),var(--teal),var(--peri));
+    box-shadow:0 0 22px var(--glowperi); position:relative;
+  }
+  .brand .logo::after{content:"";position:absolute;inset:3px;border-radius:7px;background:var(--bg)}
+  .brand h1{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:.5px;margin:0;line-height:1.1}
+  .brand .tag{font-family:var(--mono);font-size:9.5px;color:var(--teal);letter-spacing:2px;text-transform:uppercase}
+  .navbtn{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    background:transparent;border:1px solid transparent;color:var(--mut);
+    padding:10px 12px;border-radius:11px;cursor:pointer;font-family:var(--body);font-size:13.5px;font-weight:500;
+    transition:.18s;
+  }
+  .navbtn:hover{color:var(--tx);background:var(--raised)}
+  .navbtn.active{color:var(--tx);background:linear-gradient(90deg,rgba(110,139,255,.16),transparent);border-color:var(--line2);box-shadow:inset 2px 0 0 var(--teal)}
+  .navbtn .ic{width:17px;height:17px;flex:0 0 auto;opacity:.85}
+  .rail .foot{margin-top:auto;font-family:var(--mono);font-size:10px;color:var(--mut2);padding:0 8px;line-height:1.7}
+
+  .main{padding:26px 30px 60px;max-width:1280px}
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr}
+    .rail{position:sticky;top:0;height:auto;flex-direction:row;overflow-x:auto;padding:12px;gap:6px;z-index:20;
+      border-right:0;border-bottom:1px solid var(--line);background:var(--bg)}
+    .brand{display:none}
+    .navbtn{width:auto;flex:0 0 auto;padding:9px 13px}.navbtn .lbl{white-space:nowrap}
+    .rail .foot{display:none}
+    .main{padding:18px 14px 50px}
+  }
+
+  /* ---------- command bar ---------- */
+  .cmd{
+    border:1px solid var(--line);border-radius:20px;padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,rgba(18,26,43,.85),rgba(14,19,32,.85));backdrop-filter:blur(8px);
+  }
+  .cmd::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(600px 200px at 85% -40%,rgba(94,233,214,.12),transparent 70%);pointer-events:none}
+  .cmd-top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;position:relative}
+  .statuswrap{display:flex;align-items:center;gap:16px}
+  .statuschip{
+    font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:1px;
+    padding:9px 16px;border-radius:12px;display:flex;align-items:center;gap:9px;border:1px solid;
+  }
+  .statuschip .dot{width:9px;height:9px;border-radius:50%}
+  .s-dry{color:var(--peri);border-color:var(--peri);background:rgba(110,139,255,.10)}
+  .s-dry .dot{background:var(--peri);box-shadow:0 0 12px var(--peri)}
+  .s-live{color:var(--coral);border-color:var(--coral);background:rgba(255,92,122,.10)}
+  .s-live .dot{background:var(--coral);box-shadow:0 0 12px var(--coral);animation:blink 1.1s infinite}
+  .s-kill{color:var(--amber);border-color:var(--amber);background:rgba(255,194,75,.10)}
+  .s-kill .dot{background:var(--amber)}
+  @keyframes blink{50%{opacity:.3}}
+  .statusmeta{font-family:var(--mono);font-size:11px;color:var(--mut)}
+  .statusmeta b{color:var(--tx);font-weight:500}
+  .refresh{font-family:var(--mono);font-size:11px;color:var(--mut);background:var(--raised);border:1px solid var(--line);
+    padding:8px 13px;border-radius:10px;cursor:pointer;transition:.18s}
+  .refresh:hover{color:var(--teal);border-color:var(--line2)}
+
+  /* engine pulse */
+  .pulse{margin-top:18px;position:relative;height:52px;border-top:1px solid var(--line);padding-top:14px}
+  .pulse-lbl{position:absolute;right:0;top:14px;font-family:var(--mono);font-size:10px;color:var(--mut2);letter-spacing:1px}
+  .pulse svg{width:100%;height:34px;display:block}
+  .pulse path{fill:none;stroke:var(--teal);stroke-width:1.6;filter:drop-shadow(0 0 4px var(--glowteal));
+    stroke-dasharray:1400;stroke-dashoffset:1400;animation:trace 4s linear infinite}
+  @keyframes trace{to{stroke-dashoffset:0}}
+
+  /* ---------- KPI tiles ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:20px}
+  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:16px;padding:15px 16px;background:var(--panel);transition:.2s;position:relative;overflow:hidden}
+  .kpi:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .kpi .k{font-family:var(--mono);font-size:10px;color:var(--mut);letter-spacing:1.3px;text-transform:uppercase}
+  .kpi .v{font-family:var(--disp);font-weight:700;font-size:25px;margin-top:7px;letter-spacing:.3px}
+  .kpi .v .u{font-size:13px;color:var(--mut);font-weight:500}
+  .kpi .sm{font-family:var(--mono);font-size:10.5px;color:var(--mut2);margin-top:5px}
+  .kpi.accent{background:linear-gradient(160deg,rgba(110,139,255,.10),var(--panel))}
+  .up{color:var(--jade)} .down{color:var(--coral)} .neu{color:var(--tx)}
+
+  /* ---------- insight ---------- */
+  .insight{display:flex;gap:13px;align-items:flex-start;border:1px solid var(--line);border-left:2px solid var(--teal);
+    border-radius:14px;padding:14px 17px;margin-bottom:24px;background:linear-gradient(90deg,rgba(94,233,214,.06),transparent)}
+  .insight .ic{color:var(--teal);flex:0 0 auto;margin-top:2px}
+  .insight .ttl{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.5px;color:var(--teal);text-transform:uppercase;margin-bottom:3px}
+  .insight .bd{font-size:13.5px;color:var(--tx)} .insight .bd b{color:var(--teal)}
+
+  /* ---------- sections ---------- */
+  section{display:none;animation:fade .35s ease}
   section.active{display:block}
-  .grid{display:grid;gap:10px}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g4{grid-template-columns:repeat(4,1fr)}
-  @media(max-width:640px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
-  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
-  .stat .k{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-  .stat .v{font-size:20px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
-  .stat .sm{font-size:11px;color:var(--mut);margin-top:2px}
-  h2{font-size:14px;margin:0 0 10px;color:var(--tx)}
-  h3{font-size:13px;margin:18px 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .panel{border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;background:var(--panel)}
+  .panel h2{font-family:var(--disp);font-size:14px;font-weight:600;letter-spacing:.5px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .panel .desc{font-size:12px;color:var(--mut);margin:0 0 16px}
+  .eyebrow{font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase}
+  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  @media(max-width:560px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+  .ministat{border:1px solid var(--line);border-radius:12px;padding:12px}
+  .ministat .k{font-family:var(--mono);font-size:9.5px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
+  .ministat .v{font-family:var(--mono);font-weight:700;font-size:18px;margin-top:5px}
+
+  /* progress */
+  .prog{height:9px;background:#0a0f1c;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:10px 0}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--peri),var(--teal));box-shadow:0 0 12px var(--glowteal)}
+  .confbadge{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:7px;border:1px solid var(--line2);color:var(--teal);text-transform:uppercase;letter-spacing:1px}
+
+  /* tables */
+  .scroll{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
-  th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
-  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .pos{color:var(--grn)} .neg{color:var(--red)}
-  .pill{padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600}
-  .pill.ok{background:rgba(22,199,132,.15);color:var(--grn)}
-  .pill.no{background:rgba(234,57,67,.15);color:var(--red)}
-  .pill.mode{background:rgba(91,141,239,.12);color:var(--acc)}
-  .prog{height:8px;background:var(--card2);border-radius:999px;overflow:hidden;border:1px solid var(--bd)}
-  .prog>i{display:block;height:100%;background:var(--acc)}
-  .ev{padding:7px 0;border-bottom:1px solid var(--bd);font-size:12.5px}
-  .ev .t{color:var(--mut);font-size:11px}
-  .lv-error{color:var(--red)} .lv-warn{color:var(--amb)} .lv-info{color:var(--tx)}
-  details{border:1px solid var(--bd);border-radius:10px;margin-bottom:8px;background:var(--card)}
-  summary{cursor:pointer;padding:11px 13px;font-weight:600;font-size:13px}
-  details>div{padding:0 13px 13px}
-  .rule{border-left:2px solid var(--acc);padding:6px 0 6px 11px;margin:8px 0}
-  .rule .ttl{font-weight:700}
-  .rule .ct{color:var(--mut);white-space:pre-wrap;font-size:12.5px}
-  .muted{color:var(--mut)} .mono{font-family:ui-monospace,Menlo,monospace}
-  .err{color:var(--amb);font-size:12px}
-  #refresh{background:var(--card);border:1px solid var(--bd);color:var(--mut);padding:6px 11px;border-radius:9px;cursor:pointer;font-size:12px}
+  th,td{text-align:left;padding:10px 11px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-family:var(--mono);color:var(--mut);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+  tbody tr{transition:.12s} tbody tr:hover{background:var(--raised)}
+  td.num,th.num{text-align:right;font-family:var(--mono)}
+  .mono{font-family:var(--mono)}
+  .empty{color:var(--mut2);padding:24px 11px;text-align:center;font-family:var(--mono);font-size:12px}
+
+  /* chips */
+  .chip{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:7px;font-weight:500;display:inline-block}
+  .chip.pass{background:rgba(63,216,164,.13);color:var(--jade);border:1px solid rgba(63,216,164,.3)}
+  .chip.rej{background:rgba(255,92,122,.10);color:var(--coral);border:1px solid rgba(255,92,122,.25)}
+  .chip.mode{background:rgba(110,139,255,.12);color:var(--peri);border:1px solid rgba(110,139,255,.25)}
+  .chip.neutral{background:var(--raised);color:var(--mut);border:1px solid var(--line)}
+
+  /* signal cards */
+  .sigcard{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:11px;transition:.18s}
+  .sigcard:hover{border-color:var(--line2)}
+  .sigcard.passrow{border-left:2px solid var(--jade)} .sigcard.rejrow{border-left:2px solid var(--coral)}
+  .sigcard .row1{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .sigcard .sym{font-family:var(--disp);font-weight:600;font-size:15px}
+  .sigcard .metrics{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:8px;display:flex;gap:14px;flex-wrap:wrap}
+  .sigcard .metrics b{color:var(--tx);font-weight:500}
+  .reasons{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+
+  /* events terminal */
+  .term{font-family:var(--mono);font-size:12px;max-height:560px;overflow:auto}
+  .ev{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .ev .ts{color:var(--mut2);flex:0 0 auto;font-size:10.5px}
+  .ev .lv{flex:0 0 52px;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+  .ev.lv-error .lv{color:var(--coral)} .ev.lv-warn .lv{color:var(--amber)} .ev.lv-info .lv{color:var(--teal)}
+  .ev .msg{color:var(--tx)}
+
+  /* rulebook + accordion */
+  details{border:1px solid var(--line);border-radius:12px;margin-bottom:9px;background:var(--panel);overflow:hidden}
+  summary{cursor:pointer;padding:13px 16px;font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.5px;
+    list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--teal);font-size:16px}
+  details[open] summary::after{content:"–"}
+  details>.body{padding:0 16px 16px}
+  .rule{border-left:2px solid var(--peri);padding:7px 0 7px 13px;margin:10px 0}
+  .rule .rt{font-family:var(--disp);font-weight:600;font-size:13px}
+  .rule .rc{color:var(--mut);white-space:pre-wrap;font-size:12.5px;margin-top:3px}
+  .secttl{font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin:18px 0 6px}
+
+  .loading{color:var(--mut2);font-family:var(--mono);font-size:12px;padding:14px 0}
+  .err{color:var(--amber);font-family:var(--mono);font-size:11.5px}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>🐂 Pordee Trading</h1>
-      <div class="sub" id="updated">กำลังโหลด…</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span id="statusBadge" class="badge b-dry">—</span>
-      <button id="refresh">↻ รีเฟรช</button>
-    </div>
-  </header>
+<div class="app">
 
-  <nav id="tabs">
-    <button data-t="status" class="active">สถานะ</button>
-    <button data-t="trades">ไม้เทรด</button>
-    <button data-t="signals">สัญญาณ</button>
-    <button data-t="events">เหตุการณ์</button>
-    <button data-t="proof">Proof / วิเคราะห์</button>
-    <button data-t="rules">Rulebook</button>
-  </nav>
+  <!-- ============ RAIL ============ -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>PORDEE</h1>
+        <div class="tag">Engine ▸ Mission Control</div>
+      </div>
+    </div>
+    <button class="navbtn active" data-t="overview"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="lbl">ภาพรวม</span></button>
+    <button class="navbtn" data-t="trades"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5 4 3 8-9"/><path d="M21 6v5h-5"/></svg><span class="lbl">ไม้เทรด</span></button>
+    <button class="navbtn" data-t="signals"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h4l2-7 4 14 2-7h4"/></svg><span class="lbl">สัญญาณ</span></button>
+    <button class="navbtn" data-t="events"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg><span class="lbl">เหตุการณ์</span></button>
+    <button class="navbtn" data-t="proof"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span class="lbl">Proof</span></button>
+    <button class="navbtn" data-t="rules"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="lbl">Rulebook</span></button>
+    <div class="foot">costcalDB · dry-run<br><span id="footclock"></span></div>
+  </aside>
 
-  <!-- STATUS -->
-  <section id="status" class="active">
-    <div class="grid g4" id="statusGrid"></div>
-    <div class="card">
-      <h2>ความคืบหน้ากลุ่มตัวอย่าง (proof_sample_status)</h2>
-      <div id="sampleBox" class="muted">…</div>
-    </div>
-    <div class="card">
-      <h2>สรุปรวม (master_analysis)</h2>
-      <div class="grid g4" id="masterGrid"></div>
-    </div>
-  </section>
+  <!-- ============ MAIN ============ -->
+  <main class="main">
 
-  <!-- TRADES -->
-  <section id="trades">
-    <div class="card">
-      <h2>กราฟ PnL สะสม (ไม้ที่ปิดแล้ว)</h2>
-      <canvas id="pnlChart" height="120"></canvas>
+    <!-- command bar -->
+    <div class="cmd">
+      <div class="cmd-top">
+        <div class="statuswrap">
+          <div id="statuschip" class="statuschip s-dry"><span class="dot"></span><span id="statustext">—</span></div>
+          <div class="statusmeta" id="statussub">เชื่อมต่อ…</div>
+        </div>
+        <button class="refresh" id="refreshBtn">↻ SYNC</button>
+      </div>
+      <div class="pulse">
+        <span class="pulse-lbl" id="pulselbl">ENGINE PULSE</span>
+        <svg viewBox="0 0 1000 34" preserveAspectRatio="none"><path d="M0,17 L380,17 L400,17 L410,5 L420,29 L432,17 L455,17 L640,17 L660,17 L668,9 L676,25 L686,17 L1000,17"/></svg>
+      </div>
     </div>
-    <div class="card">
-      <h2>ไม้ที่เปิดอยู่</h2>
-      <div class="scroll"><table id="openTbl"><thead></thead><tbody></tbody></table></div>
-    </div>
-    <div class="card">
-      <h2>ไม้ที่ปิดแล้ว (ล่าสุด 100)</h2>
-      <div class="scroll"><table id="closedTbl"><thead></thead><tbody></tbody></table></div>
-    </div>
-  </section>
 
-  <!-- SIGNALS -->
-  <section id="signals">
-    <div class="card">
-      <h2>สัญญาณล่าสุด (live_signals)</h2>
-      <div class="scroll"><table id="sigTbl"><thead></thead><tbody></tbody></table></div>
-    </div>
-  </section>
+    <!-- KPIs -->
+    <div class="kpis" id="kpis"></div>
 
-  <!-- EVENTS -->
-  <section id="events">
-    <div class="card">
-      <h2>เหตุการณ์ระบบ (live_events)</h2>
-      <div id="evBox"></div>
+    <!-- insight -->
+    <div class="insight" id="insight" style="display:none">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <div><div class="ttl">Engine Insight</div><div class="bd" id="insightbd"></div></div>
     </div>
-  </section>
 
-  <!-- PROOF -->
-  <section id="proof">
-    <div class="card">
-      <h2>เทียบกลยุทธ์ (proof_strategy_showdown)</h2>
-      <div class="scroll" id="showdownBox"></div>
-    </div>
-    <div class="card">
-      <h2>กลยุทธ์ดีที่สุด (grid_search_results — เรียงตาม net_pnl)</h2>
-      <div class="scroll" id="gridBox"></div>
-    </div>
-    <h3>View วิเคราะห์ทั้งหมด</h3>
-    <div id="suiteBox"></div>
-  </section>
+    <!-- OVERVIEW -->
+    <section id="overview" class="active">
+      <div class="grid2">
+        <div class="panel">
+          <div class="eyebrow">Performance</div>
+          <h2>PnL สะสม (ไม้ที่ปิดแล้ว)</h2>
+          <p class="desc">มูลค่ากำไร/ขาดทุนรวมจากไม้จำลองที่ปิดไปแล้ว ตามลำดับเวลา</p>
+          <canvas id="pnlChart" height="150"></canvas>
+        </div>
+        <div class="panel">
+          <div class="eyebrow">Evidence</div>
+          <h2>ความเชื่อมั่นของกลุ่มตัวอย่าง</h2>
+          <p class="desc">ยิ่งสะสม path มากเท่าไร ผลยิ่งน่าเชื่อถือ</p>
+          <div id="sampleBox" class="loading">…</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">Master Analysis</div>
+        <h2>สถิติรวมทั้งระบบ</h2>
+        <div class="statgrid" id="masterGrid"></div>
+      </div>
+    </section>
 
-  <!-- RULES -->
-  <section id="rules">
-    <div class="card">
-      <h2>Rulebook (memebot_rulebook)</h2>
-      <div id="ruleBox" class="muted">…</div>
-    </div>
-  </section>
+    <!-- TRADES -->
+    <section id="trades">
+      <div class="panel">
+        <div class="eyebrow">Open positions</div>
+        <h2>ไม้ที่เปิดอยู่</h2>
+        <div class="scroll"><table id="openTbl"><thead></thead><tbody></tbody></table></div>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">History</div>
+        <h2>ไม้ที่ปิดแล้ว · ล่าสุด 100</h2>
+        <div class="scroll"><table id="closedTbl"><thead></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- SIGNALS -->
+    <section id="signals">
+      <div class="panel">
+        <div class="eyebrow">Filter feed</div>
+        <h2>สัญญาณล่าสุด · เหตุผลการกรอง</h2>
+        <p class="desc">ทุกสัญญาณที่เข้ามา ระบบกรองด้วย Golden Rule แล้วบอกเหตุผลทุกข้อ — ส่วนใหญ่ถูกตัดทิ้งเพราะกลยุทธ์เลือกเฉพาะ</p>
+        <div id="sigBox" class="loading">…</div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="events">
+      <div class="panel">
+        <div class="eyebrow">System log</div>
+        <h2>เหตุการณ์ระบบ · เรียลไทม์</h2>
+        <div class="term" id="evBox"></div>
+      </div>
+    </section>
+
+    <!-- PROOF -->
+    <section id="proof">
+      <div class="panel">
+        <div class="eyebrow">Strategy comparison</div>
+        <h2>เทียบกลยุทธ์ · Strategy Showdown</h2>
+        <div class="scroll" id="showdownBox"></div>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">Optimization</div>
+        <h2>กลยุทธ์ดีที่สุด · เรียงตาม Net PnL</h2>
+        <div class="scroll" id="gridBox"></div>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">Full analysis suite · 18 views</div>
+        <h2>วิเคราะห์เชิงลึกทั้งหมด</h2>
+        <div id="suiteBox"></div>
+      </div>
+    </section>
+
+    <!-- RULES -->
+    <section id="rules">
+      <div class="panel">
+        <div class="eyebrow">Strategy rulebook</div>
+        <h2>กฎการเทรด · Memebot Rulebook</h2>
+        <div id="ruleBox" class="loading">…</div>
+      </div>
+    </section>
+
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -158,182 +341,212 @@ const SUPABASE_URL = "https://fkhykyfgykguvpelmdsf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA"; // read-only (RLS: anon SELECT)
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ---- format helpers ----
-const n = (x,d=2)=> (x==null||isNaN(x))?"—":Number(x).toLocaleString("en-US",{maximumFractionDigits:d});
-const usd = (x,d=2)=> (x==null||isNaN(x))?"—":"$"+n(x,d);
-const pct = (x,d=1)=> (x==null||isNaN(x))?"—":n(x,d)+"%";
-const cls = (x)=> (Number(x)>=0?"pos":"neg");
-const when = (t)=> t? new Date(t).toLocaleString("th-TH",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
-const esc = (s)=> String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const n=(x,d=2)=>(x==null||isNaN(x))?"—":Number(x).toLocaleString("en-US",{maximumFractionDigits:d});
+const usd=(x,d=2)=>(x==null||isNaN(x))?"—":"$"+n(x,d);
+const pct=(x,d=1)=>(x==null||isNaN(x))?"—":n(x,d)+"%";
+const cl=(x)=>Number(x)>=0?"up":"down";
+const esc=(s)=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const tnum=(t)=>t?new Date(t).toLocaleString("th-TH",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"—";
+const ttime=(t)=>t?new Date(t).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"—";
+const isToday=(t)=>{const d=new Date(t),x=new Date();return d.toDateString()===x.toDateString()};
 
-async function sel(view, build){
-  try{ const {data,error}=await build(db.from(view).select("*")); if(error) throw error; return data||[]; }
-  catch(e){ console.warn(view,e.message); return {__err:e.message}; }
+async function sel(view,build){
+  try{const{data,error}=await build(db.from(view).select("*"));if(error)throw error;return data||[]}
+  catch(e){console.warn(view,e.message);return{__err:e.message}}
 }
 
-// ---- STATUS ----
+/* ---------- command bar + KPIs + insight ---------- */
 async function loadStatus(){
-  const rows = await sel("live_status", q=>q.limit(1));
-  const s = Array.isArray(rows)? rows[0] : null;
-  const badge = document.getElementById("statusBadge");
-  if(s){
-    if(s.kill_switch){ badge.className="badge b-kill"; badge.textContent="KILL SWITCH"; }
-    else if(s.live_enabled && !s.dry_run){ badge.className="badge b-live"; badge.textContent="● LIVE จริง"; }
-    else { badge.className="badge b-dry"; badge.textContent="DRY-RUN"; }
-  }
-  const g = document.getElementById("statusGrid");
-  if(!s){ g.innerHTML='<div class="err">โหลด live_status ไม่ได้</div>'; return; }
-  const dayLimit = s.capital_usd*s.daily_loss_limit_pct/100, totLimit = s.capital_usd*s.total_loss_limit_pct/100;
-  g.innerHTML = [
-    ["ทุน", usd(s.capital_usd), "ไม้ละ "+usd(s.position_size_usd)],
-    ["ไม้เปิดอยู่", s.open_trades+" / "+s.max_concurrent, "พร้อมกันสูงสุด"],
-    ["ไม้วันนี้", s.trades_today+" / "+s.max_trades_per_day, "ต่อวัน"],
-    ["PnL วันนี้", `<span class="${cls(s.pnl_today_usd)}">${usd(s.pnl_today_usd)}</span>`, "เพดาน -"+usd(dayLimit)],
-    ["PnL รวม", `<span class="${cls(s.pnl_total_usd)}">${usd(s.pnl_total_usd)}</span>`, "เพดาน -"+usd(totLimit)],
-    ["Trailing stop", pct(s.trailing_stop_pct,0), "Pump เข้า <"+pct(s.entry_pump_max,0)],
-    ["Liquidity ขั้นต่ำ", usd(s.min_liquidity_usd,0), ""],
-    ["กระเป๋า", `<span class="mono" style="font-size:11px">${s.wallet_pubkey? s.wallet_pubkey.slice(0,4)+"…"+s.wallet_pubkey.slice(-4):"ยังไม่ตั้ง"}</span>`, ""],
-  ].map(([k,v,sm])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="sm">${sm}</div></div>`).join("");
+  const rows=await sel("live_status",q=>q.limit(1));
+  const s=Array.isArray(rows)?rows[0]:null;
+  const chip=document.getElementById("statuschip"),txt=document.getElementById("statustext"),sub=document.getElementById("statussub");
+  if(!s){chip.className="statuschip s-kill";txt.textContent="OFFLINE";sub.innerHTML='<span class="err">เชื่อม live_status ไม่ได้</span>';return null;}
+  if(s.kill_switch){chip.className="statuschip s-kill";txt.textContent="KILL SWITCH";}
+  else if(s.live_enabled&&!s.dry_run){chip.className="statuschip s-live";txt.textContent="LIVE";}
+  else{chip.className="statuschip s-dry";txt.textContent="DRY-RUN";}
+  sub.innerHTML=`โหมดจำลอง · กระเป๋า <b>${s.wallet_pubkey?s.wallet_pubkey.slice(0,4)+"…"+s.wallet_pubkey.slice(-4):"ยังไม่ตั้ง"}</b> · อัปเดต <b>${ttime(s.updated_at)}</b>`;
 
-  // sample status
-  const sb = (await sel("proof_sample_status", q=>q.limit(1)));
-  const ss = Array.isArray(sb)? sb[0]:null; const box=document.getElementById("sampleBox");
-  if(ss){
-    box.innerHTML = `
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span>${ss.complete_paths} / ${ss.target_signals} path สมบูรณ์</span>
-        <span class="pill mode">${esc(ss.confidence_level)}</span></div>
-      <div class="prog"><i style="width:${Math.min(100,ss.pct_to_target||0)}%"></i></div>
-      <div class="sm muted" style="margin-top:8px">pump&lt;20%: ${ss.pump20_n} · pump&lt;30%: ${ss.pump30_n} · rug เจอ: ${ss.rugs_seen} · ${pct(ss.pct_to_target)} ของเป้า</div>`;
-  } else box.innerHTML='<span class="err">โหลด proof_sample_status ไม่ได้</span>';
-
-  // master
-  const mr = await sel("master_analysis", q=>q.limit(1)); const m = Array.isArray(mr)?mr[0]:null;
-  const mg=document.getElementById("masterGrid");
-  if(m){
-    mg.innerHTML=[
-      ["สัญญาณรวม", n(m.total_signals,0)],["path สมบูรณ์", n(m.total_complete,0)],
-      ["price ticks", n(m.total_ticks,0)],["rug รวม", n(m.total_rugs,0)],
-      ["pump20 N", n(m.p20_n,0)],["pump20 win", pct(m.p20_win)],
-      ["trail30 จริง", pct(m.p20_trail30_real)],["ถึงเป้า", pct(m.pct_to_target)],
-    ].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
-  } else mg.innerHTML='<div class="err">โหลด master_analysis ไม่ได้</div>';
+  const dayLim=s.capital_usd*s.daily_loss_limit_pct/100, totLim=s.capital_usd*s.total_loss_limit_pct/100;
+  const tiles=[
+    {k:"ทุนตั้งต้น",v:usd(s.capital_usd,0),sm:`ไม้ละ ${usd(s.position_size_usd,0)}`,cls:"neu",accent:true},
+    {k:"ไม้เปิดอยู่",v:`${s.open_trades}<span class="u"> / ${s.max_concurrent}</span>`,sm:"พร้อมกันสูงสุด",cls:"neu"},
+    {k:"ไม้วันนี้",v:`${s.trades_today}<span class="u"> / ${s.max_trades_per_day}</span>`,sm:"โควตาต่อวัน",cls:"neu"},
+    {k:"PnL วันนี้",v:usd(s.pnl_today_usd),sm:`เพดาน −${usd(dayLim,0)}`,cls:cl(s.pnl_today_usd)},
+    {k:"PnL รวม",v:usd(s.pnl_total_usd),sm:`เพดาน −${usd(totLim,0)}`,cls:cl(s.pnl_total_usd)},
+  ];
+  document.getElementById("kpis").innerHTML=tiles.map(t=>
+    `<div class="kpi ${t.accent?'accent':''}"><div class="k">${t.k}</div><div class="v ${t.cls}">${t.v}</div><div class="sm">${t.sm}</div></div>`).join("");
+  return s;
 }
 
-// ---- TRADES ----
+async function loadSample(){
+  const rows=await sel("proof_sample_status",q=>q.limit(1));
+  const ss=Array.isArray(rows)?rows[0]:null, box=document.getElementById("sampleBox");
+  if(!ss){box.innerHTML='<span class="err">โหลด proof_sample_status ไม่ได้</span>';return null;}
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span class="mono" style="font-size:20px;font-weight:700">${ss.complete_paths}<span style="color:var(--mut);font-size:13px"> / ${ss.target_signals}</span></span>
+      <span class="confbadge">${esc(ss.confidence_level)}</span></div>
+    <div class="prog"><i style="width:${Math.min(100,ss.pct_to_target||0)}%"></i></div>
+    <div class="statgrid" style="margin-top:14px">
+      <div class="ministat"><div class="k">pump &lt;20%</div><div class="v">${n(ss.pump20_n,0)}</div></div>
+      <div class="ministat"><div class="k">pump &lt;30%</div><div class="v">${n(ss.pump30_n,0)}</div></div>
+      <div class="ministat"><div class="k">rug เจอ</div><div class="v down">${n(ss.rugs_seen,0)}</div></div>
+      <div class="ministat"><div class="k">ถึงเป้า</div><div class="v">${pct(ss.pct_to_target)}</div></div>
+    </div>`;
+  return ss;
+}
+
+async function loadMaster(){
+  const rows=await sel("master_analysis",q=>q.limit(1)); const m=Array.isArray(rows)?rows[0]:null;
+  const g=document.getElementById("masterGrid");
+  if(!m){g.innerHTML='<span class="err">โหลด master_analysis ไม่ได้</span>';return;}
+  const cells=[["สัญญาณรวม",n(m.total_signals,0),""],["path สมบูรณ์",n(m.total_complete,0),""],
+    ["price ticks",n(m.total_ticks,0),""],["rug รวม",n(m.total_rugs,0),"down"],
+    ["pump20 N",n(m.p20_n,0),""],["pump20 win",pct(m.p20_win),"up"],
+    ["trail30 จริง",pct(m.p20_trail30_real),cl(m.p20_trail30_real)],["avg liq",usd(m.p20_avg_liq,0),""]];
+  g.innerHTML=cells.map(([k,v,c])=>`<div class="ministat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join("");
+}
+
+function renderInsight(s,ss,sigs){
+  const box=document.getElementById("insight"),bd=document.getElementById("insightbd");
+  if(!ss){box.style.display="none";return;}
+  const arr=Array.isArray(sigs)?sigs:[];
+  const today=arr.filter(x=>isToday(x.detected_at));
+  const passT=today.filter(x=>x.passed_filter).length, rejT=today.length-passT;
+  let msg;
+  const live=s&&s.live_enabled&&!s.dry_run;
+  if((ss.pct_to_target||0)<100){
+    msg=`สะสมหลักฐานอยู่ — กลุ่มตัวอย่างที่ <b>${pct(ss.pct_to_target)}</b> ของเป้า (${ss.complete_paths}/${ss.target_signals} path) ระดับความเชื่อมั่น <b>${esc(ss.confidence_level)}</b> ยังไม่ควรเปิดเงินจริง ปล่อย dry-run สะสมต่อ วันนี้กรองแล้ว <b>${today.length}</b> สัญญาณ (ผ่าน ${passT} · ตัด ${rejT})`;
+  }else{
+    msg=`กลุ่มตัวอย่างถึงเป้าแล้ว (<b>${pct(ss.pct_to_target)}</b>) ความเชื่อมั่น <b>${esc(ss.confidence_level)}</b> — ตรวจ Net PnL ในแท็บ Proof ให้บวกอย่างมีนัยก่อนพิจารณา live${live?'':' วันนี้กรอง '+today.length+' สัญญาณ (ผ่าน '+passT+')'}`;
+  }
+  bd.innerHTML=msg; box.style.display="flex";
+}
+
+/* ---------- trades ---------- */
 let chart;
 async function loadTrades(){
-  const open = await sel("live_trades", q=>q.eq("status","open").order("opened_at",{ascending:false}));
-  const oh=document.querySelector("#openTbl thead"), ob=document.querySelector("#openTbl tbody");
-  oh.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>เข้า</th><th class='num'>ขนาด$</th><th class='num'>stop</th><th>เปิดเมื่อ</th></tr>";
-  ob.innerHTML = (Array.isArray(open)&&open.length)? open.map(t=>`<tr>
-    <td>${esc(t.symbol)}</td><td><span class="pill mode">${esc(t.mode)}</span></td>
-    <td class="num mono">${t.entry_price!=null?Number(t.entry_price).toExponential(3):"—"}</td>
-    <td class="num">${usd(t.entry_amount_usd)}</td>
-    <td class="num mono">${t.trailing_stop_price!=null?Number(t.trailing_stop_price).toExponential(3):"—"}</td>
-    <td>${when(t.opened_at)}</td></tr>`).join("") : `<tr><td colspan="6" class="muted">ไม่มีไม้เปิดอยู่</td></tr>`;
+  const open=await sel("live_trades",q=>q.eq("status","open").order("opened_at",{ascending:false}));
+  const oh=document.querySelector("#openTbl thead"),ob=document.querySelector("#openTbl tbody");
+  oh.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>ราคาเข้า</th><th class='num'>ขนาด</th><th class='num'>Stop</th><th>เปิดเมื่อ</th></tr>";
+  const oa=Array.isArray(open)?open:[];
+  ob.innerHTML=oa.length?oa.map(t=>`<tr><td>${esc(t.symbol)}</td><td><span class="chip mode">${esc(t.mode)}</span></td>
+    <td class="num">${t.entry_price!=null?Number(t.entry_price).toExponential(3):"—"}</td><td class="num">${usd(t.entry_amount_usd)}</td>
+    <td class="num">${t.trailing_stop_price!=null?Number(t.trailing_stop_price).toExponential(3):"—"}</td><td class="mono">${tnum(t.opened_at)}</td></tr>`).join("")
+    :`<tr><td colspan="6" class="empty">ยังไม่มีไม้เปิดอยู่ — รอสัญญาณที่ผ่านการกรอง</td></tr>`;
 
-  const closed = await sel("live_trades", q=>q.eq("status","closed").order("closed_at",{ascending:false}).limit(100));
-  const ch=document.querySelector("#closedTbl thead"), cb=document.querySelector("#closedTbl tbody");
-  ch.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>PnL$</th><th class='num'>PnL%</th><th>เหตุออก</th><th>ปิดเมื่อ</th></tr>";
-  const arr = Array.isArray(closed)? closed : [];
-  cb.innerHTML = arr.length? arr.map(t=>`<tr>
-    <td>${esc(t.symbol)}</td><td><span class="pill mode">${esc(t.mode)}</span></td>
-    <td class="num ${cls(t.pnl_usd)}">${usd(t.pnl_usd)}</td>
-    <td class="num ${cls(t.pnl_pct)}">${pct(t.pnl_pct)}</td>
-    <td class="muted">${esc(t.exit_reason)}</td><td>${when(t.closed_at)}</td></tr>`).join("") : `<tr><td colspan="6" class="muted">ยังไม่มีไม้ปิด</td></tr>`;
+  const closed=await sel("live_trades",q=>q.eq("status","closed").order("closed_at",{ascending:false}).limit(100));
+  const ch=document.querySelector("#closedTbl thead"),cb=document.querySelector("#closedTbl tbody");
+  ch.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>PnL</th><th class='num'>PnL%</th><th>เหตุออก</th><th>ปิดเมื่อ</th></tr>";
+  const ca=Array.isArray(closed)?closed:[];
+  cb.innerHTML=ca.length?ca.map(t=>`<tr><td>${esc(t.symbol)}</td><td><span class="chip mode">${esc(t.mode)}</span></td>
+    <td class="num ${cl(t.pnl_usd)}">${usd(t.pnl_usd)}</td><td class="num ${cl(t.pnl_pct)}">${pct(t.pnl_pct)}</td>
+    <td><span class="chip neutral">${esc(t.exit_reason)}</span></td><td class="mono">${tnum(t.closed_at)}</td></tr>`).join("")
+    :`<tr><td colspan="6" class="empty">ยังไม่มีไม้ปิด</td></tr>`;
 
-  // cumulative pnl chart (oldest→newest)
-  const ord = arr.slice().reverse(); let cum=0; const labels=[],dpts=[];
-  ord.forEach((t,i)=>{ cum+=Number(t.pnl_usd||0); labels.push(i+1); dpts.push(cum); });
-  const ctx=document.getElementById("pnlChart");
-  if(chart) chart.destroy();
-  chart=new Chart(ctx,{type:"line",data:{labels,datasets:[{data:dpts,borderColor:cum>=0?"#16c784":"#ea3943",backgroundColor:"rgba(91,141,239,.08)",fill:true,tension:.25,pointRadius:0,borderWidth:2}]},
-    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#8b93a7"},grid:{color:"#232838"}},y:{ticks:{color:"#8b93a7",callback:v=>"$"+v},grid:{color:"#232838"}}}}});
+  const ord=ca.slice().reverse(); let cum=0; const L=[],D=[];
+  ord.forEach((t,i)=>{cum+=Number(t.pnl_usd||0);L.push(i+1);D.push(+cum.toFixed(2))});
+  const ctx=document.getElementById("pnlChart"); if(chart)chart.destroy();
+  const grd=ctx.getContext("2d").createLinearGradient(0,0,0,150);
+  grd.addColorStop(0,"rgba(94,233,214,.28)");grd.addColorStop(1,"rgba(94,233,214,0)");
+  chart=new Chart(ctx,{type:"line",data:{labels:L.length?L:["—"],datasets:[{data:D.length?D:[0],
+    borderColor:cum>=0?"#5EE9D6":"#FF5C7A",backgroundColor:grd,fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>"$"+c.parsed.y}}},
+      scales:{x:{ticks:{color:"#566286",font:{family:"JetBrains Mono",size:10}},grid:{color:"#1E2840"}},
+              y:{ticks:{color:"#566286",font:{family:"JetBrains Mono",size:10},callback:v=>"$"+v},grid:{color:"#1E2840"}}}}});
 }
 
-// ---- SIGNALS ----
+/* ---------- signals ---------- */
+let lastSignals=[];
 async function loadSignals(){
-  const rows = await sel("live_signals", q=>q.order("detected_at",{ascending:false}).limit(40));
-  const h=document.querySelector("#sigTbl thead"), b=document.querySelector("#sigTbl tbody");
-  h.innerHTML="<tr><th>เหรียญ</th><th>กรอง</th><th class='num'>score</th><th class='num'>pump%</th><th class='num'>liq$</th><th class='num'>อายุชม.</th><th>สถานะ</th><th>เมื่อ</th></tr>";
-  const arr=Array.isArray(rows)?rows:[];
-  b.innerHTML = arr.length? arr.map(s=>`<tr>
-    <td>${esc(s.symbol)}</td>
-    <td><span class="pill ${s.passed_filter?'ok':'no'}">${s.passed_filter?'ผ่าน':'ไม่ผ่าน'}</span></td>
-    <td class="num">${n(s.signal_score,0)}</td>
-    <td class="num">${pct(s.entry_pump,0)}</td>
-    <td class="num">${usd(s.liquidity_usd,0)}</td>
-    <td class="num">${n(s.age_hours,1)}</td>
-    <td class="muted">${esc(s.status)}</td><td>${when(s.detected_at)}</td></tr>`).join("") : `<tr><td colspan="8" class="muted">ยังไม่มีสัญญาณ</td></tr>`;
+  const rows=await sel("live_signals",q=>q.order("detected_at",{ascending:false}).limit(30));
+  lastSignals=Array.isArray(rows)?rows:[];
+  const box=document.getElementById("sigBox");
+  if(!lastSignals.length){box.innerHTML='<div class="empty">ยังไม่มีสัญญาณเข้ามา — scanner จะป้อนเมื่อเจอเหรียญใหม่</div>';return;}
+  box.innerHTML=lastSignals.map(s=>{
+    const reasons=Array.isArray(s.filter_reasons)?s.filter_reasons:[];
+    return `<div class="sigcard ${s.passed_filter?'passrow':'rejrow'}">
+      <div class="row1">
+        <div style="display:flex;align-items:center;gap:11px">
+          <span class="sym">${esc(s.symbol)}</span>
+          <span class="chip ${s.passed_filter?'pass':'rej'}">${s.passed_filter?'ผ่าน':'ตัดทิ้ง'}</span>
+          <span class="chip neutral">score ${n(s.signal_score,0)}</span>
+        </div>
+        <span class="mono" style="font-size:10.5px;color:var(--mut2)">${tnum(s.detected_at)}</span>
+      </div>
+      <div class="metrics"><span>pump <b>${pct(s.entry_pump,0)}</b></span><span>liq <b>${usd(s.liquidity_usd,0)}</b></span>
+        <span>อายุ <b>${n(s.age_hours,1)}ชม.</b></span><span>สถานะ <b>${esc(s.status)}</b></span></div>
+      ${reasons.length?`<div class="reasons">${reasons.map(r=>`<span class="chip ${String(r).includes('✅')?'pass':'rej'}">${esc(r)}</span>`).join("")}</div>`:""}
+    </div>`;
+  }).join("");
 }
 
-// ---- EVENTS ----
+/* ---------- events ---------- */
 async function loadEvents(){
-  const rows = await sel("live_events", q=>q.order("created_at",{ascending:false}).limit(50));
-  const box=document.getElementById("evBox"); const arr=Array.isArray(rows)?rows:[];
-  box.innerHTML = arr.length? arr.map(e=>`<div class="ev">
-    <span class="lv-${esc(e.level)}">[${esc(e.level)}]</span> ${esc(e.message)}
-    <div class="t">${esc(e.source)} · ${when(e.created_at)}</div></div>`).join("") : '<span class="muted">ยังไม่มีเหตุการณ์</span>';
+  const rows=await sel("live_events",q=>q.order("created_at",{ascending:false}).limit(60));
+  const box=document.getElementById("evBox"),a=Array.isArray(rows)?rows:[];
+  box.innerHTML=a.length?a.map(e=>`<div class="ev lv-${esc(e.level)}">
+    <span class="ts">${ttime(e.created_at)}</span><span class="lv">${esc(e.level)}</span><span class="msg">${esc(e.message)}</span></div>`).join("")
+    :'<div class="empty">ยังไม่มีเหตุการณ์</div>';
+  if(a[0]) document.getElementById("pulselbl").textContent="ENGINE PULSE · ล่าสุด "+ttime(a[0].created_at);
 }
 
-// ---- generic table renderer ----
+/* ---------- proof ---------- */
 function tableHTML(rows){
-  if(rows.__err) return `<div class="err">โหลดไม่ได้: ${esc(rows.__err)}</div>`;
-  if(!rows.length) return '<div class="muted">ไม่มีข้อมูล</div>';
+  if(rows.__err)return`<div class="err">โหลดไม่ได้: ${esc(rows.__err)}</div>`;
+  if(!rows.length)return'<div class="empty">ไม่มีข้อมูล</div>';
   const cols=Object.keys(rows[0]);
-  const num=c=>typeof rows[0][c]==="number";
-  return `<table><thead><tr>${cols.map(c=>`<th class="${num(c)?'num':''}">${esc(c)}</th>`).join("")}</tr></thead>
-    <tbody>${rows.map(r=>`<tr>${cols.map(c=>{
-      let v=r[c]; if(v&&typeof v==="object") v=JSON.stringify(v);
-      const isNum=typeof r[c]==="number";
-      return `<td class="${isNum?'num mono':''}">${esc(isNum?n(r[c],4):v)}</td>`;
-    }).join("")}</tr>`).join("")}</tbody></table>`;
+  return`<table><thead><tr>${cols.map(c=>`<th class="${typeof rows[0][c]==="number"?'num':''}">${esc(c)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${cols.map(c=>{let v=r[c];const num=typeof v==="number";if(v&&typeof v==="object")v=JSON.stringify(v);
+      return`<td class="${num?'num':''}">${esc(num?n(r[c],4):v)}</td>`}).join("")}</tr>`).join("")}</tbody></table>`;
 }
-
-// ---- PROOF ----
 const SUITE=["analysis_executive_summary","analysis_risk_profile","analysis_danger_filter","analysis_rug_signals","analysis_rug_escape","analysis_age_buckets","analysis_liquidity_buckets","analysis_peak_speed","analysis_best_exit_per_coin","analysis_exit_win_count","meme_version_compare","proof_golden_filter","proof_liquidity_edge","proof_liquidity_guard","proof_liq_guard_per_coin","proof_liquidity_drain","proof_holdtime_curve","proof_time_of_day"];
+let proofLoaded=false;
 async function loadProof(){
-  const sd = await sel("proof_strategy_showdown", q=>q.limit(50));
-  document.getElementById("showdownBox").innerHTML = tableHTML(sd);
-  const gr = await sel("grid_search_results", q=>q.order("net_pnl",{ascending:false}).limit(30));
-  document.getElementById("gridBox").innerHTML = tableHTML(gr);
-  const box=document.getElementById("suiteBox"); box.innerHTML="";
+  if(proofLoaded)return; proofLoaded=true;
+  document.getElementById("showdownBox").innerHTML=tableHTML(await sel("proof_strategy_showdown",q=>q.limit(50)));
+  document.getElementById("gridBox").innerHTML=tableHTML(await sel("grid_search_results",q=>q.order("net_pnl",{ascending:false}).limit(30)));
+  const box=document.getElementById("suiteBox");box.innerHTML="";
   for(const v of SUITE){
     const d=document.createElement("details");
-    d.innerHTML=`<summary>${v}</summary><div class="scroll"><div class="muted">แตะเพื่อโหลด…</div></div>`;
-    d.addEventListener("toggle",async()=>{
-      if(d.open && !d.dataset.loaded){ d.dataset.loaded="1";
-        const rows=await sel(v,q=>q.limit(50)); d.querySelector("div.scroll").innerHTML=tableHTML(rows); }
-    });
+    d.innerHTML=`<summary>${v}</summary><div class="body scroll"><div class="loading">แตะเพื่อโหลด…</div></div>`;
+    d.addEventListener("toggle",async()=>{if(d.open&&!d.dataset.l){d.dataset.l=1;
+      d.querySelector(".body").innerHTML=tableHTML(await sel(v,q=>q.limit(50)))}});
     box.appendChild(d);
   }
 }
 
-// ---- RULES ----
+/* ---------- rules ---------- */
+let rulesLoaded=false;
 async function loadRules(){
-  const rows = await sel("memebot_rulebook", q=>q.order("section",{ascending:true}).order("ordr",{ascending:true}));
-  const box=document.getElementById("ruleBox"); const arr=Array.isArray(rows)?rows:[];
-  if(!arr.length){ box.innerHTML='<span class="muted">ยังไม่มี rulebook</span>'; return; }
-  const bySec={}; arr.forEach(r=>{(bySec[r.section]=bySec[r.section]||[]).push(r);});
-  box.innerHTML = Object.entries(bySec).map(([sec,items])=>`<h3>${esc(sec)}</h3>`+
-    items.map(r=>`<div class="rule"><div class="ttl">${esc(r.title)}</div><div class="ct">${esc(r.content)}</div></div>`).join("")).join("");
+  if(rulesLoaded)return; rulesLoaded=true;
+  const rows=await sel("memebot_rulebook",q=>q.order("section",{ascending:true}).order("ordr",{ascending:true}));
+  const box=document.getElementById("ruleBox"),a=Array.isArray(rows)?rows:[];
+  if(!a.length){box.innerHTML='<div class="empty">ยังไม่มี rulebook</div>';return;}
+  const by={};a.forEach(r=>{(by[r.section]=by[r.section]||[]).push(r)});
+  box.innerHTML=Object.entries(by).map(([sec,items])=>`<div class="secttl">${esc(sec)}</div>`+
+    items.map(r=>`<div class="rule"><div class="rt">${esc(r.title)}</div><div class="rc">${esc(r.content)}</div></div>`).join("")).join("");
 }
 
-// ---- orchestration ----
-async function loadAll(){
-  document.getElementById("updated").textContent="กำลังโหลด…";
-  await Promise.allSettled([loadStatus(),loadTrades(),loadSignals(),loadEvents(),loadProof(),loadRules()]);
-  document.getElementById("updated").textContent="อัปเดตล่าสุด "+new Date().toLocaleTimeString("th-TH");
+/* ---------- orchestrate ---------- */
+async function loadCore(){
+  const [s,ss]=await Promise.all([loadStatus(),loadSample()]);
+  await Promise.all([loadMaster(),loadTrades(),loadSignals(),loadEvents()]);
+  renderInsight(s,ss,lastSignals);
 }
-document.getElementById("tabs").addEventListener("click",e=>{
-  const t=e.target.dataset.t; if(!t) return;
-  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+function tickClock(){document.getElementById("footclock").textContent=ttime(new Date())}
+
+document.querySelector(".rail").addEventListener("click",e=>{
+  const b=e.target.closest(".navbtn"); if(!b)return; const t=b.dataset.t;
+  document.querySelectorAll(".navbtn").forEach(x=>x.classList.toggle("active",x===b));
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("active",s.id===t));
+  if(t==="proof")loadProof(); if(t==="rules")loadRules();
+  window.scrollTo({top:0,behavior:"smooth"});
 });
-document.getElementById("refresh").addEventListener("click",loadAll);
-loadAll();
-setInterval(loadAll,30000);
+document.getElementById("refreshBtn").addEventListener("click",loadCore);
+loadCore(); tickClock();
+setInterval(loadCore,30000); setInterval(tickClock,1000);
 </script>
 </body>
 </html>
