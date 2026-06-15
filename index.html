@@ -116,6 +116,13 @@
   .kpi .v .u{font-size:13px;color:var(--mut);font-weight:500}
   .kpi .sm{font-family:var(--mono);font-size:10.5px;color:var(--mut2);margin-top:5px}
   .kpi.accent{background:linear-gradient(160deg,rgba(110,139,255,.10),var(--panel))}
+  .perfhero{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+  @media(max-width:560px){.perfhero{grid-template-columns:1fr}}
+  .perfhero .kpi .v{font-size:30px}
+  .perfnote{font-family:var(--mono);font-size:11px;margin-top:13px;padding:9px 12px;border-radius:10px;border:1px solid var(--line)}
+  .perfnote.warn{color:var(--amber);border-color:rgba(255,194,75,.35);background:rgba(255,194,75,.06)}
+  .perfnote.ok{color:var(--jade);border-color:rgba(63,216,164,.35);background:rgba(63,216,164,.06)}
+  .perfnote.neu{color:var(--mut)}
   .up{color:var(--jade)} .down{color:var(--coral)} .neu{color:var(--tx)}
 
   /* ---------- insight ---------- */
@@ -249,6 +256,14 @@
 
     <!-- OVERVIEW -->
     <section id="overview" class="active">
+      <div class="panel">
+        <div class="eyebrow">Live performance · เงินจริง</div>
+        <h2>Profit Factor · Win Rate · Expectancy</h2>
+        <p class="desc">คำนวณสดจากไม้ <b>live</b> ที่ปิดแล้วเท่านั้น — ตัวเลขจะนิ่งและเชื่อถือได้เมื่อไม้ปิดสะสมพอ (แนะนำดูหลัง ~20 ไม้)</p>
+        <div id="perfHero" class="perfhero"></div>
+        <div class="statgrid" id="perfGrid" style="margin-top:14px"></div>
+        <div id="perfNote" class="perfnote neu"></div>
+      </div>
       <div class="grid2">
         <div class="panel">
           <div class="eyebrow">Performance</div>
@@ -529,10 +544,43 @@ async function loadRules(){
     items.map(r=>`<div class="rule"><div class="rt">${esc(r.title)}</div><div class="rc">${esc(r.content)}</div></div>`).join("")).join("");
 }
 
+/* ---------- live performance (PF / win rate / expectancy) ---------- */
+async function loadPerformance(){
+  const rows=await sel("live_performance",q=>q.limit(1));
+  const p=Array.isArray(rows)?rows[0]:null;
+  const hero=document.getElementById("perfHero"),grid=document.getElementById("perfGrid"),note=document.getElementById("perfNote");
+  if(!p){hero.innerHTML='<div class="err">โหลด live_performance ไม่ได้</div>';grid.innerHTML="";note.textContent="";return;}
+  const nC=Number(p.closed_trades||0);
+  const pfTxt=p.profit_factor==null?"—":n(p.profit_factor,2)+"×";
+  const pfCls=p.profit_factor==null?"neu":(Number(p.profit_factor)>=1?"up":"down");
+  const wrTxt=p.win_rate_pct==null?"—":pct(p.win_rate_pct,1);
+  const wrCls=p.win_rate_pct==null?"neu":(Number(p.win_rate_pct)>=50?"up":"down");
+  const expTxt=p.expectancy_usd==null?"—":usd(p.expectancy_usd);
+  const expCls=p.expectancy_usd==null?"neu":cl(p.expectancy_usd);
+  hero.innerHTML=`
+    <div class="kpi accent"><div class="k">Profit Factor</div><div class="v ${pfCls}">${pfTxt}</div><div class="sm">กำไรรวม ÷ ขาดทุนรวม · ดีเมื่อ &gt; 1</div></div>
+    <div class="kpi"><div class="k">Win Rate</div><div class="v ${wrCls}">${wrTxt}</div><div class="sm">ชนะ ${n(p.wins,0)} · แพ้ ${n(p.losses,0)}${Number(p.breakeven)?' · เสมอ '+n(p.breakeven,0):''}</div></div>
+    <div class="kpi"><div class="k">Expectancy / ไม้</div><div class="v ${expCls}">${expTxt}</div><div class="sm">กำไรคาดหวังเฉลี่ยต่อไม้ · ${pct(p.expectancy_pct)}</div></div>`;
+  const cells=[
+    ["ไม้ปิดแล้ว",n(p.closed_trades,0),""],
+    ["PnL รวม",usd(p.total_pnl_usd),cl(p.total_pnl_usd)],
+    ["กำไรเฉลี่ย/ไม้ชนะ",usd(p.avg_win_usd),"up"],
+    ["ขาดทุนเฉลี่ย/ไม้แพ้",usd(p.avg_loss_usd),"down"],
+    ["ไม้ดีสุด",usd(p.best_usd),"up"],
+    ["ไม้แย่สุด",usd(p.worst_usd),"down"],
+    ["ถือเฉลี่ย",p.avg_hold_min==null?"—":n(p.avg_hold_min,0)+" นาที",""],
+    ["ไม้เปิดอยู่",n(p.open_trades,0),""]
+  ];
+  grid.innerHTML=cells.map(([k,v,c])=>`<div class="ministat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join("");
+  if(nC===0){note.className="perfnote neu";note.textContent="ยังไม่มีไม้ปิด — รอไม้แรกปิดก่อน ตัวเลขจะเริ่มเดินทันที";}
+  else if(nC<20){note.className="perfnote warn";note.textContent=`⚠ ตัวอย่างยังน้อย (${nC}/20 ไม้) — PF / Win rate ยังแกว่งง่ายมาก อย่าเพิ่งสรุปว่ากลยุทธ์ดีหรือแย่`;}
+  else{note.className="perfnote ok";note.textContent=`✓ ตัวอย่างพอประเมินเบื้องต้นแล้ว (${nC} ไม้) — PF ${pfTxt} · Win ${wrTxt} ใช้ตัดสินใจเรื่องเติมทุนได้`;}
+}
+
 /* ---------- orchestrate ---------- */
 async function loadCore(){
   const [s,ss]=await Promise.all([loadStatus(),loadSample()]);
-  await Promise.all([loadMaster(),loadTrades(),loadSignals(),loadEvents()]);
+  await Promise.all([loadMaster(),loadTrades(),loadSignals(),loadEvents(),loadPerformance()]);
   renderInsight(s,ss,lastSignals);
 }
 function tickClock(){document.getElementById("footclock").textContent=ttime(new Date())}
