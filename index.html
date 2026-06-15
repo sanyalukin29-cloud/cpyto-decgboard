@@ -1,406 +1,339 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pordee Trading · Strategy Proof Lab</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pordee Trading — Dashboard</title>
 <style>
-:root{--bg:#03060E;--bg2:#060B18;--panel:rgba(10,18,36,0.82);--line:rgba(70,160,255,0.20);--line2:rgba(70,160,255,0.08);--cyan:#3FE0FF;--violet:#B98CFF;--mint:#4DF2B0;--coral:#FF6B7E;--amber:#FFC24B;--gold:#FFD66B;--orange:#FF9D4B;--ink:#E4EEFF;--dim:#7C93BE;--mono:'IBM Plex Mono',monospace;--thai:'IBM Plex Sans Thai',sans-serif;--display:'Orbitron',sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--ink);font-family:var(--thai);min-height:100vh;overflow-x:hidden}
-.gf{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(63,224,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(63,224,255,0.05) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 25%,transparent 95%)}
-.go{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none;z-index:0}
-.o1{width:520px;height:520px;background:radial-gradient(circle,#163a6e,transparent 70%);top:-180px;left:-120px}
-.o2{width:460px;height:460px;background:radial-gradient(circle,#3a1d6e,transparent 70%);top:8%;right:-160px}
-.sl{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.18) 2px 4px)}
-.w{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:16px 12px 90px}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line2);margin-bottom:14px}
-.brand{display:flex;align-items:center;gap:11px}
-.logo{width:42px;height:42px;border:1.5px solid var(--cyan);border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-weight:800;color:var(--cyan);box-shadow:0 0 18px rgba(63,224,255,.25);font-size:18px}
-.brand h1{font-family:var(--display);font-size:16px;letter-spacing:1px;font-weight:800}
-.brand p{font-size:11px;color:var(--dim);letter-spacing:.5px;margin-top:2px}
-.live{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--mint);border:1px solid var(--line);padding:6px 11px;border-radius:20px;background:rgba(77,242,176,.06)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 70%,transparent);padding:8px 0}
-nav a{font-family:var(--mono);font-size:11.5px;color:var(--dim);border:1px solid var(--line2);padding:7px 12px;border-radius:8px;text-decoration:none;transition:.15s;white-space:nowrap}
-nav a:hover{color:var(--cyan);border-color:var(--line)}
-.p{position:relative;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:16px;margin-bottom:16px;backdrop-filter:blur(6px)}
-.p::before{content:"";position:absolute;left:0;top:14px;width:3px;height:24px;background:var(--cyan);border-radius:0 3px 3px 0;box-shadow:0 0 10px var(--cyan)}
-.pt{font-family:var(--display);font-size:13px;letter-spacing:.6px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sub{font-size:11.5px;color:var(--dim);margin-bottom:13px;line-height:1.6}
-.loading{font-family:var(--mono);font-size:12px;color:var(--dim);padding:18px;text-align:center}
-.err{font-family:var(--mono);font-size:11px;color:var(--coral);padding:12px;text-align:center}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{font-family:var(--mono);font-size:10px;letter-spacing:.5px;color:var(--dim);text-align:right;padding:8px 7px;border-bottom:1px solid var(--line);text-transform:uppercase;font-weight:400}
-th:first-child,td:first-child{text-align:left}
-td{padding:9px 7px;border-bottom:1px solid var(--line2);text-align:right;font-variant-numeric:tabular-nums}
-tr:last-child td{border-bottom:none}
-.tag{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:5px;display:inline-block}
-.win{background:rgba(77,242,176,.12);color:var(--mint)}
-.lose{background:rgba(255,107,126,.12);color:var(--coral)}
-.warn{background:rgba(255,194,75,.12);color:var(--amber)}
-.pos{color:var(--mint)}.neg{color:var(--coral)}.neu{color:var(--ink)}
-.star{background:linear-gradient(90deg,rgba(255,214,107,.18),rgba(255,214,107,.04));border:1px solid rgba(255,214,107,.3)!important}
-.starcell{color:var(--gold);font-weight:600}
-.banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bmeter{flex:1;min-width:180px}
-.bbar{height:9px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;margin-top:7px}
-.bbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--orange),var(--gold))}
-.bstats{display:flex;gap:18px;flex-wrap:wrap}
-.bstat b{font-family:var(--display);font-size:18px;display:block}
-.bstat s{font-size:10px;color:var(--dim);text-decoration:none}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.card{border:1px solid var(--line2);border-radius:11px;padding:13px}
-.card h4{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-bottom:8px;font-weight:400;letter-spacing:.3px}
-.card .big{font-family:var(--display);font-size:22px;line-height:1}
-.card .meta{font-size:11px;color:var(--dim);margin-top:7px;line-height:1.5}
-.callout{border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-top:13px;font-size:12px;line-height:1.7;background:rgba(63,224,255,.04)}
-.callout b{color:var(--cyan)}
-.rb{border:1px solid var(--line2);border-radius:12px;padding:14px;margin-bottom:11px;border-left:3px solid var(--mint)}
-.rb.avoid{border-left-color:var(--coral)}.rb.exit{border-left-color:var(--violet)}.rb.never{border-left-color:var(--orange)}
-.rb h3{font-family:var(--mono);font-size:11px;letter-spacing:.5px;color:var(--dim);margin-bottom:6px}
-.rb .rule{font-size:14px;font-weight:600;line-height:1.6;margin-bottom:6px}
-.rb .ev{font-size:11px;color:var(--dim);line-height:1.6}
-.rb .ev b{color:var(--ink)}
-.note{font-size:11px;color:var(--amber);background:rgba(255,194,75,.06);border:1px solid rgba(255,194,75,.18);border-radius:9px;padding:10px 12px;line-height:1.65;margin-top:8px}
-footer{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:24px;line-height:1.8}
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-@media(max-width:560px){.brand h1{font-size:14px}table{font-size:11px}th,td{padding:7px 5px}}
+  :root{
+    --bg:#0b0e14;--card:#131722;--card2:#0f131c;--bd:#232838;--tx:#e6e9ef;--mut:#8b93a7;
+    --grn:#16c784;--red:#ea3943;--amb:#f0b90b;--acc:#5b8def;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;font-size:14px;line-height:1.5}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  h1{font-size:17px;margin:0;letter-spacing:.3px}
+  .sub{color:var(--mut);font-size:12px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px}
+  .b-live{background:rgba(234,57,67,.15);color:var(--red);border:1px solid var(--red)}
+  .b-dry{background:rgba(91,141,239,.15);color:var(--acc);border:1px solid var(--acc)}
+  .b-kill{background:rgba(240,185,11,.15);color:var(--amb);border:1px solid var(--amb)}
+  nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;position:sticky;top:0;background:var(--bg);z-index:5}
+  nav button{flex:0 0 auto;background:var(--card);border:1px solid var(--bd);color:var(--mut);padding:7px 13px;border-radius:9px;cursor:pointer;font-size:13px}
+  nav button.active{color:var(--tx);border-color:var(--acc);background:rgba(91,141,239,.12)}
+  section{display:none}
+  section.active{display:block}
+  .grid{display:grid;gap:10px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:640px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
+  .stat .k{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:20px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+  .stat .sm{font-size:11px;color:var(--mut);margin-top:2px}
+  h2{font-size:14px;margin:0 0 10px;color:var(--tx)}
+  h3{font-size:13px;margin:18px 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+  th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .pos{color:var(--grn)} .neg{color:var(--red)}
+  .pill{padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600}
+  .pill.ok{background:rgba(22,199,132,.15);color:var(--grn)}
+  .pill.no{background:rgba(234,57,67,.15);color:var(--red)}
+  .pill.mode{background:rgba(91,141,239,.12);color:var(--acc)}
+  .prog{height:8px;background:var(--card2);border-radius:999px;overflow:hidden;border:1px solid var(--bd)}
+  .prog>i{display:block;height:100%;background:var(--acc)}
+  .ev{padding:7px 0;border-bottom:1px solid var(--bd);font-size:12.5px}
+  .ev .t{color:var(--mut);font-size:11px}
+  .lv-error{color:var(--red)} .lv-warn{color:var(--amb)} .lv-info{color:var(--tx)}
+  details{border:1px solid var(--bd);border-radius:10px;margin-bottom:8px;background:var(--card)}
+  summary{cursor:pointer;padding:11px 13px;font-weight:600;font-size:13px}
+  details>div{padding:0 13px 13px}
+  .rule{border-left:2px solid var(--acc);padding:6px 0 6px 11px;margin:8px 0}
+  .rule .ttl{font-weight:700}
+  .rule .ct{color:var(--mut);white-space:pre-wrap;font-size:12.5px}
+  .muted{color:var(--mut)} .mono{font-family:ui-monospace,Menlo,monospace}
+  .err{color:var(--amb);font-size:12px}
+  #refresh{background:var(--card);border:1px solid var(--bd);color:var(--mut);padding:6px 11px;border-radius:9px;cursor:pointer;font-size:12px}
 </style>
 </head>
 <body>
-<div class="gf"></div><div class="go o1"></div><div class="go o2"></div><div class="sl"></div>
-<div class="w">
+<div class="wrap">
   <header>
-    <div class="brand">
-      <div class="logo">P</div>
-      <div><h1>PORDEE TRADING</h1><p>STRATEGY PROOF LAB · MemeBot</p></div>
+    <div>
+      <h1>🐂 Pordee Trading</h1>
+      <div class="sub" id="updated">กำลังโหลด…</div>
     </div>
-    <div class="live"><span class="dot"></span><span id="liveTxt">เชื่อมต่อ…</span></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="statusBadge" class="badge b-dry">—</span>
+      <button id="refresh">↻ รีเฟรช</button>
+    </div>
   </header>
 
-  <nav>
-    <a href="#sample">📊 สถานะ</a>
-    <a href="#ver">🆚 v1·v2·v3</a>
-    <a href="#v5">🛡️ v5 Guard</a>
-    <a href="#grid">🔬 Grid Search</a>
-    <a href="#golden">⭐ Golden Filter</a>
-    <a href="#liq">💧 Liquidity</a>
-    <a href="#rug">☠️ Rug / Hold</a>
-    <a href="#rules">📜 Rulebook</a>
+  <nav id="tabs">
+    <button data-t="status" class="active">สถานะ</button>
+    <button data-t="trades">ไม้เทรด</button>
+    <button data-t="signals">สัญญาณ</button>
+    <button data-t="events">เหตุการณ์</button>
+    <button data-t="proof">Proof / วิเคราะห์</button>
+    <button data-t="rules">Rulebook</button>
   </nav>
 
-  <div class="p" id="sample">
-    <div class="pt">📊 สถานะตัวอย่าง · ความเชื่อมั่น</div>
-    <div class="sub">เก็บ path ราคาจริงไปแล้วกี่ % ของเป้า 200 สัญญาณ — ยิ่งน้อย ยิ่งต้องระวังว่าผลที่เห็นอาจเป็นฟลุก</div>
-    <div id="sampleBox"><div class="loading">⟳ กำลังโหลด…</div></div>
-  </div>
+  <!-- STATUS -->
+  <section id="status" class="active">
+    <div class="grid g4" id="statusGrid"></div>
+    <div class="card">
+      <h2>ความคืบหน้ากลุ่มตัวอย่าง (proof_sample_status)</h2>
+      <div id="sampleBox" class="muted">…</div>
+    </div>
+    <div class="card">
+      <h2>สรุปรวม (master_analysis)</h2>
+      <div class="grid g4" id="masterGrid"></div>
+    </div>
+  </section>
 
-  <div class="p" id="ver">
-    <div class="pt">🆚 เปรียบเทียบเวอร์ชัน v1 · v2 · v3</div>
-    <div class="sub">v1 = จับทุกเหรียญ · v2 = กรอง pump&lt;30 · v3 = pump&lt;20 + trailing 25% (robust winner) — ตัวชี้วัดสำคัญสุดคือ <b>Trailing 25% net</b> (หลังหัก fee)</div>
-    <div class="scroll"><div id="verBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
+  <!-- TRADES -->
+  <section id="trades">
+    <div class="card">
+      <h2>กราฟ PnL สะสม (ไม้ที่ปิดแล้ว)</h2>
+      <canvas id="pnlChart" height="120"></canvas>
+    </div>
+    <div class="card">
+      <h2>ไม้ที่เปิดอยู่</h2>
+      <div class="scroll"><table id="openTbl"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card">
+      <h2>ไม้ที่ปิดแล้ว (ล่าสุด 100)</h2>
+      <div class="scroll"><table id="closedTbl"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </section>
 
-  <div class="p" id="v5">
-    <div class="pt">🛡️ v5 · LIQUIDITY-GUARDED MemeBot</div>
-    <div class="sub">เทียบ 3 ทางออกในแต่ละกลุ่ม: ถือยาว (hold h1) · trailing 30% · liquidity-guard (ขายเมื่อ liq หาย &gt;15%) — guard ออกแบบมาเพื่อ "หนี rug ให้ทันก่อนตาย"</div>
-    <div class="scroll"><div id="guardBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-    <div class="pt" style="margin-top:18px;font-size:11.5px">🏆 เหรียญที่ guard ช่วยได้มากสุด (guard_saved)</div>
-    <div class="scroll"><div id="guardCoinBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
+  <!-- SIGNALS -->
+  <section id="signals">
+    <div class="card">
+      <h2>สัญญาณล่าสุด (live_signals)</h2>
+      <div class="scroll"><table id="sigTbl"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </section>
 
-  <div class="p" id="grid">
-    <div class="pt">🔬 GRID SEARCH · ค้นหากลยุทธ์ดีสุดจากข้อมูลจริง</div>
-    <div class="sub">ทดสอบทุกคอมโบ (เกณฑ์เข้า × trailing) จาก path ราคาจริง — คอลัมน์ <b>net หักตัวดีสุด</b> = ผลถ้าตัดเหรียญดีสุดออก 1 ตัว ถ้ายังบวก = ทนทานจริง ไม่ใช่ฟลุกจากเหรียญเดียว</div>
-    <div class="scroll"><div id="gridBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
+  <!-- EVENTS -->
+  <section id="events">
+    <div class="card">
+      <h2>เหตุการณ์ระบบ (live_events)</h2>
+      <div id="evBox"></div>
+    </div>
+  </section>
 
-  <div class="p" id="golden">
-    <div class="pt">⭐ GOLDEN FILTER · รวมทุกกฎ</div>
-    <div class="sub">3 กฎ: pump&lt;20 · อายุ 4-12 ชม. · liquidity ≥ 60k — ยิ่งผ่านครบ ผลยิ่งดี</div>
-    <div class="scroll"><div id="goldenBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
+  <!-- PROOF -->
+  <section id="proof">
+    <div class="card">
+      <h2>เทียบกลยุทธ์ (proof_strategy_showdown)</h2>
+      <div class="scroll" id="showdownBox"></div>
+    </div>
+    <div class="card">
+      <h2>กลยุทธ์ดีที่สุด (grid_search_results — เรียงตาม net_pnl)</h2>
+      <div class="scroll" id="gridBox"></div>
+    </div>
+    <h3>View วิเคราะห์ทั้งหมด</h3>
+    <div id="suiteBox"></div>
+  </section>
 
-  <div class="p" id="liq">
-    <div class="pt">💧 LIQUIDITY EDGE & DRAIN</div>
-    <div class="sub">edge ที่แท้จริงของ memecoin — ไม่ใช่การเลือก trailing % แต่เป็นการจับ liquidity ไหลออกให้ทันก่อน rug</div>
-    <div id="drainBox"><div class="loading">⟳ กำลังโหลด…</div></div>
-    <div class="pt" style="margin-top:18px;font-size:11.5px">🧱 กำแพง slippage (liquidity edge)</div>
-    <div class="scroll"><div id="edgeBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
-
-  <div class="p" id="rug">
-    <div class="pt">☠️ RUG ESCAPE & HOLD-TIME</div>
-    <div class="sub">หนี rug ได้แค่ไหน + กฎทอง "อย่าถือข้ามวัน"</div>
-    <div class="scroll"><div id="rugBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-    <div class="pt" style="margin-top:18px;font-size:11.5px">⏱ Hold-time curve (ผลเฉลี่ย % ตามเวลาที่ถือ)</div>
-    <div class="scroll"><div id="holdBox"><div class="loading">⟳ กำลังโหลด…</div></div></div>
-  </div>
-
-  <div class="p" id="rules">
-    <div class="pt">📜 RULEBOOK · กฎ MemeBot ที่ดีที่สุดเท่าที่ข้อมูลมี</div>
-    <div class="sub">สรุปจากทุกแผงพิสูจน์ — ตัวเลขดึงสดจากฐานข้อมูล อัปเดตเองเมื่อข้อมูลโต</div>
-    <div id="rulesBox"><div class="loading">⟳ กำลังโหลด…</div></div>
-  </div>
-
-  <footer>
-    PORDEE TRADING · STRATEGY PROOF LAB<br>
-    ข้อมูลสดจาก Supabase · อัปเดตอัตโนมัติทุก 2 นาที · <span id="ts">—</span>
-  </footer>
+  <!-- RULES -->
+  <section id="rules">
+    <div class="card">
+      <h2>Rulebook (memebot_rulebook)</h2>
+      <div id="ruleBox" class="muted">…</div>
+    </div>
+  </section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-const SB="https://fkhykyfgykguvpelmdsf.supabase.co";
-const AK="sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA";
-const H={apikey:AK,Authorization:"Bearer "+AK};
-const $=s=>document.querySelector(s);
-const num=(n,d=1)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("th-TH",{maximumFractionDigits:d});
-const pct=(n,d=1)=>n==null||isNaN(n)?"—":(Number(n)>0?"+":"")+num(n,d)+"%";
-const cls=n=>n==null?"neu":Number(n)>0?"pos":Number(n)<0?"neg":"neu";
-const esc=s=>String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const SUPABASE_URL = "https://fkhykyfgykguvpelmdsf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D9QFmKMzoyzvCRrsqHoeDg_9JpKjKJA"; // read-only (RLS: anon SELECT)
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function get(p){
-  const r=await fetch(SB+"/rest/v1/"+p,{headers:H});
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const t=await r.text();return t?JSON.parse(t):[];
-}
-function panelErr(id,e){const el=$("#"+id);if(el)el.innerHTML='<div class="err">โหลดไม่สำเร็จ: '+esc(e.message||e)+'</div>';}
+// ---- format helpers ----
+const n = (x,d=2)=> (x==null||isNaN(x))?"—":Number(x).toLocaleString("en-US",{maximumFractionDigits:d});
+const usd = (x,d=2)=> (x==null||isNaN(x))?"—":"$"+n(x,d);
+const pct = (x,d=1)=> (x==null||isNaN(x))?"—":n(x,d)+"%";
+const cls = (x)=> (Number(x)>=0?"pos":"neg");
+const when = (t)=> t? new Date(t).toLocaleString("th-TH",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
+const esc = (s)=> String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
-/* ---------- SAMPLE STATUS ---------- */
-function rSample(d){
-  const s=d[0]; if(!s){$("#sampleBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  const p=Math.max(2,Math.min(100,Number(s.pct_to_target)||0));
-  $("#sampleBox").innerHTML=`
-  <div class="banner">
-    <div class="bmeter">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim)">
-        <span>ความคืบหน้าสู่เป้า ${num(s.target_signals,0)} สัญญาณ</span><span style="color:var(--gold)">${num(s.pct_to_target,0)}%</span>
-      </div>
-      <div class="bbar"><i style="width:${p}%"></i></div>
-      <div style="margin-top:9px;font-size:12px;color:var(--amber)">⚠️ ${esc(s.confidence_level)}</div>
-    </div>
-    <div class="bstats">
-      <div class="bstat"><b>${num(s.complete_paths,0)}</b><s>complete paths</s></div>
-      <div class="bstat"><b class="pos">${num(s.pump20_n,0)}</b><s>pump&lt;20</s></div>
-      <div class="bstat"><b>${num(s.pump30_n,0)}</b><s>pump&lt;30</s></div>
-      <div class="bstat"><b class="neg">${num(s.rugs_seen,0)}</b><s>rug ที่เห็น</s></div>
-    </div>
-  </div>`;
+async function sel(view, build){
+  try{ const {data,error}=await build(db.from(view).select("*")); if(error) throw error; return data||[]; }
+  catch(e){ console.warn(view,e.message); return {__err:e.message}; }
 }
 
-/* ---------- VERSION COMPARE ---------- */
-function rVer(d){
-  if(!d.length){$("#verBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  d.sort((a,b)=>String(a.version).localeCompare(String(b.version)));
-  let best=-1e9,bi=-1; d.forEach((r,i)=>{if(r.trail25_net!=null&&Number(r.trail25_net)>best){best=Number(r.trail25_net);bi=i;}});
-  let h=`<table><thead><tr><th>เวอร์ชัน</th><th>สัญญาณ</th><th>path ครบ</th><th>h1 avg</th><th>h1 win</th><th>Trail25 net ⭐</th><th>peak avg</th></tr></thead><tbody>`;
-  d.forEach((r,i)=>{
-    h+=`<tr${i===bi?' class="star"':''}>
-      <td><b>${esc(r.version)}</b><div style="font-size:10px;color:var(--dim);font-weight:400">${esc(r.note||"")}</div></td>
-      <td>${num(r.signals,0)}</td><td>${num(r.complete_paths,0)}</td>
-      <td class="${cls(r.h1_avg)}">${pct(r.h1_avg)}</td>
-      <td>${num(r.h1_win,0)}%</td>
-      <td class="${i===bi?'starcell':cls(r.trail25_net)}">${pct(r.trail25_net)}${i===bi?' ⭐':''}</td>
-      <td>${pct(r.avg_peak)}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  const bv=d[bi];
-  if(bv) h+=`<div class="callout">⭐ ผู้ชนะตอนนี้: <b>${esc(bv.version)}</b> — Trailing 25% net <b>${pct(bv.trail25_net)}</b> (h1 win ${num(bv.h1_win,0)}%) แต่ path ครบเพิ่งมี ${num(bv.complete_paths,0)} ตัว ${Number(bv.complete_paths)<10?'→ <b>ยังตัดสินไม่ได้</b> ต้องสะสมเพิ่ม':''}</div>`;
-  $("#verBox").innerHTML=h;
+// ---- STATUS ----
+async function loadStatus(){
+  const rows = await sel("live_status", q=>q.limit(1));
+  const s = Array.isArray(rows)? rows[0] : null;
+  const badge = document.getElementById("statusBadge");
+  if(s){
+    if(s.kill_switch){ badge.className="badge b-kill"; badge.textContent="KILL SWITCH"; }
+    else if(s.live_enabled && !s.dry_run){ badge.className="badge b-live"; badge.textContent="● LIVE จริง"; }
+    else { badge.className="badge b-dry"; badge.textContent="DRY-RUN"; }
+  }
+  const g = document.getElementById("statusGrid");
+  if(!s){ g.innerHTML='<div class="err">โหลด live_status ไม่ได้</div>'; return; }
+  const dayLimit = s.capital_usd*s.daily_loss_limit_pct/100, totLimit = s.capital_usd*s.total_loss_limit_pct/100;
+  g.innerHTML = [
+    ["ทุน", usd(s.capital_usd), "ไม้ละ "+usd(s.position_size_usd)],
+    ["ไม้เปิดอยู่", s.open_trades+" / "+s.max_concurrent, "พร้อมกันสูงสุด"],
+    ["ไม้วันนี้", s.trades_today+" / "+s.max_trades_per_day, "ต่อวัน"],
+    ["PnL วันนี้", `<span class="${cls(s.pnl_today_usd)}">${usd(s.pnl_today_usd)}</span>`, "เพดาน -"+usd(dayLimit)],
+    ["PnL รวม", `<span class="${cls(s.pnl_total_usd)}">${usd(s.pnl_total_usd)}</span>`, "เพดาน -"+usd(totLimit)],
+    ["Trailing stop", pct(s.trailing_stop_pct,0), "Pump เข้า <"+pct(s.entry_pump_max,0)],
+    ["Liquidity ขั้นต่ำ", usd(s.min_liquidity_usd,0), ""],
+    ["กระเป๋า", `<span class="mono" style="font-size:11px">${s.wallet_pubkey? s.wallet_pubkey.slice(0,4)+"…"+s.wallet_pubkey.slice(-4):"ยังไม่ตั้ง"}</span>`, ""],
+  ].map(([k,v,sm])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="sm">${sm}</div></div>`).join("");
+
+  // sample status
+  const sb = (await sel("proof_sample_status", q=>q.limit(1)));
+  const ss = Array.isArray(sb)? sb[0]:null; const box=document.getElementById("sampleBox");
+  if(ss){
+    box.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>${ss.complete_paths} / ${ss.target_signals} path สมบูรณ์</span>
+        <span class="pill mode">${esc(ss.confidence_level)}</span></div>
+      <div class="prog"><i style="width:${Math.min(100,ss.pct_to_target||0)}%"></i></div>
+      <div class="sm muted" style="margin-top:8px">pump&lt;20%: ${ss.pump20_n} · pump&lt;30%: ${ss.pump30_n} · rug เจอ: ${ss.rugs_seen} · ${pct(ss.pct_to_target)} ของเป้า</div>`;
+  } else box.innerHTML='<span class="err">โหลด proof_sample_status ไม่ได้</span>';
+
+  // master
+  const mr = await sel("master_analysis", q=>q.limit(1)); const m = Array.isArray(mr)?mr[0]:null;
+  const mg=document.getElementById("masterGrid");
+  if(m){
+    mg.innerHTML=[
+      ["สัญญาณรวม", n(m.total_signals,0)],["path สมบูรณ์", n(m.total_complete,0)],
+      ["price ticks", n(m.total_ticks,0)],["rug รวม", n(m.total_rugs,0)],
+      ["pump20 N", n(m.p20_n,0)],["pump20 win", pct(m.p20_win)],
+      ["trail30 จริง", pct(m.p20_trail30_real)],["ถึงเป้า", pct(m.pct_to_target)],
+    ].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+  } else mg.innerHTML='<div class="err">โหลด master_analysis ไม่ได้</div>';
 }
 
-/* ---------- V5 LIQUIDITY GUARD ---------- */
-function rGuard(d){
-  if(!d.length){$("#guardBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<table><thead><tr><th>กลุ่ม</th><th>เหรียญ</th><th>ถือ h1</th><th>trail 30%</th><th>liq-guard 15%</th><th>guard vs trail</th><th>guard บน rug</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.grp)}</b></td><td>${num(r.coins,0)}</td>
-      <td class="${cls(r.hold_h1)}">${pct(r.hold_h1)}</td>
-      <td class="${cls(r.trail30)}">${pct(r.trail30)}</td>
-      <td class="${cls(r.liq_guard)}">${pct(r.liq_guard)}</td>
-      <td class="${cls(r.liq_vs_trail)}">${pct(r.liq_vs_trail)}</td>
-      <td class="${cls(r.liq_guard_on_rugs)}">${r.liq_guard_on_rugs==null?'—':pct(r.liq_guard_on_rugs)}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#guardBox").innerHTML=h;
-}
-function rGuardCoin(d){
-  if(!d.length){$("#guardCoinBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<table><thead><tr><th>เหรียญ</th><th>entry pump</th><th>liq หาย</th><th>ถ้าถือ (h1)</th><th>liq-exit</th><th>trail 30%</th><th>guard ช่วย</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.symbol)}</b></td>
-      <td>${pct(r.entry_pump,0)}</td>
-      <td class="${Number(r.liq_drained_pct)<-50?'neg':'neu'}">${pct(r.liq_drained_pct,0)}</td>
-      <td class="${cls(r.pnl_h1)}">${pct(r.pnl_h1)}</td>
-      <td class="${cls(r.sim_liq_exit)}">${pct(r.sim_liq_exit)}</td>
-      <td class="${cls(r.sim_trail_30)}">${pct(r.sim_trail_30)}</td>
-      <td class="${cls(r.guard_saved)}"><b>${pct(r.guard_saved)}</b></td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#guardCoinBox").innerHTML=h;
+// ---- TRADES ----
+let chart;
+async function loadTrades(){
+  const open = await sel("live_trades", q=>q.eq("status","open").order("opened_at",{ascending:false}));
+  const oh=document.querySelector("#openTbl thead"), ob=document.querySelector("#openTbl tbody");
+  oh.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>เข้า</th><th class='num'>ขนาด$</th><th class='num'>stop</th><th>เปิดเมื่อ</th></tr>";
+  ob.innerHTML = (Array.isArray(open)&&open.length)? open.map(t=>`<tr>
+    <td>${esc(t.symbol)}</td><td><span class="pill mode">${esc(t.mode)}</span></td>
+    <td class="num mono">${t.entry_price!=null?Number(t.entry_price).toExponential(3):"—"}</td>
+    <td class="num">${usd(t.entry_amount_usd)}</td>
+    <td class="num mono">${t.trailing_stop_price!=null?Number(t.trailing_stop_price).toExponential(3):"—"}</td>
+    <td>${when(t.opened_at)}</td></tr>`).join("") : `<tr><td colspan="6" class="muted">ไม่มีไม้เปิดอยู่</td></tr>`;
+
+  const closed = await sel("live_trades", q=>q.eq("status","closed").order("closed_at",{ascending:false}).limit(100));
+  const ch=document.querySelector("#closedTbl thead"), cb=document.querySelector("#closedTbl tbody");
+  ch.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>PnL$</th><th class='num'>PnL%</th><th>เหตุออก</th><th>ปิดเมื่อ</th></tr>";
+  const arr = Array.isArray(closed)? closed : [];
+  cb.innerHTML = arr.length? arr.map(t=>`<tr>
+    <td>${esc(t.symbol)}</td><td><span class="pill mode">${esc(t.mode)}</span></td>
+    <td class="num ${cls(t.pnl_usd)}">${usd(t.pnl_usd)}</td>
+    <td class="num ${cls(t.pnl_pct)}">${pct(t.pnl_pct)}</td>
+    <td class="muted">${esc(t.exit_reason)}</td><td>${when(t.closed_at)}</td></tr>`).join("") : `<tr><td colspan="6" class="muted">ยังไม่มีไม้ปิด</td></tr>`;
+
+  // cumulative pnl chart (oldest→newest)
+  const ord = arr.slice().reverse(); let cum=0; const labels=[],dpts=[];
+  ord.forEach((t,i)=>{ cum+=Number(t.pnl_usd||0); labels.push(i+1); dpts.push(cum); });
+  const ctx=document.getElementById("pnlChart");
+  if(chart) chart.destroy();
+  chart=new Chart(ctx,{type:"line",data:{labels,datasets:[{data:dpts,borderColor:cum>=0?"#16c784":"#ea3943",backgroundColor:"rgba(91,141,239,.08)",fill:true,tension:.25,pointRadius:0,borderWidth:2}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#8b93a7"},grid:{color:"#232838"}},y:{ticks:{color:"#8b93a7",callback:v=>"$"+v},grid:{color:"#232838"}}}}});
 }
 
-/* ---------- GRID SEARCH ---------- */
-function rGrid(d){
-  if(!d.length){$("#gridBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let robust=d.filter(r=>Number(r.net_drop_best)>0).sort((a,b)=>Number(b.net_drop_best)-Number(a.net_drop_best))[0];
-  let h=`<table><thead><tr><th>เกณฑ์เข้า</th><th>ทางออก</th><th>เหรียญ</th><th>net</th><th>win</th><th>worst</th><th>net หักตัวดีสุด</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    const robustOk=Number(r.net_drop_best)>0;
-    h+=`<tr${robust&&r===robust?' class="star"':''}>
-      <td><b>${esc(r.entry_rule)}</b></td><td>${esc(r.exit_rule)}</td>
-      <td>${num(r.coins,0)}</td>
-      <td class="${cls(r.net_pnl)}">${pct(r.net_pnl)}</td>
-      <td>${num(r.win_rate,0)}%</td>
-      <td class="neg">${pct(r.worst)}</td>
-      <td class="${cls(r.net_drop_best)}">${pct(r.net_drop_best)} ${robustOk?'<span class="tag win">✓ทน</span>':''}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  if(robust) h+=`<div class="callout">🏆 ทนทานที่สุด (net ยังบวกแม้ตัดเหรียญดีสุดออก): <b>${esc(robust.entry_rule)} + ${esc(robust.exit_rule)}</b> — net หักตัวดีสุด <b>${pct(robust.net_drop_best)}</b>, win ${num(robust.win_rate,0)}%, N=${num(robust.coins,0)}</div>`;
-  else h+=`<div class="callout">⚠️ <b>ยังไม่มีกลยุทธ์ใดที่ net หักตัวดีสุดเป็นบวก</b> — แปลว่าทุกกลยุทธ์ยังพึ่ง outlier อยู่ ต้องสะสมเหรียญเพิ่มก่อนยืนยัน</div>`;
-  $("#gridBox").innerHTML=h;
+// ---- SIGNALS ----
+async function loadSignals(){
+  const rows = await sel("live_signals", q=>q.order("detected_at",{ascending:false}).limit(40));
+  const h=document.querySelector("#sigTbl thead"), b=document.querySelector("#sigTbl tbody");
+  h.innerHTML="<tr><th>เหรียญ</th><th>กรอง</th><th class='num'>score</th><th class='num'>pump%</th><th class='num'>liq$</th><th class='num'>อายุชม.</th><th>สถานะ</th><th>เมื่อ</th></tr>";
+  const arr=Array.isArray(rows)?rows:[];
+  b.innerHTML = arr.length? arr.map(s=>`<tr>
+    <td>${esc(s.symbol)}</td>
+    <td><span class="pill ${s.passed_filter?'ok':'no'}">${s.passed_filter?'ผ่าน':'ไม่ผ่าน'}</span></td>
+    <td class="num">${n(s.signal_score,0)}</td>
+    <td class="num">${pct(s.entry_pump,0)}</td>
+    <td class="num">${usd(s.liquidity_usd,0)}</td>
+    <td class="num">${n(s.age_hours,1)}</td>
+    <td class="muted">${esc(s.status)}</td><td>${when(s.detected_at)}</td></tr>`).join("") : `<tr><td colspan="8" class="muted">ยังไม่มีสัญญาณ</td></tr>`;
 }
 
-/* ---------- GOLDEN FILTER ---------- */
-function rGolden(d){
-  if(!d.length){$("#goldenBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<table><thead><tr><th>ระดับ</th><th>เหรียญ</th><th>pump avg</th><th>liq avg</th><th>peak avg</th><th>h1 avg</th><th>win</th><th>rug</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.filter_level)}</b></td>
-      <td>${num(r.coins,0)}</td>
-      <td>${pct(r.avg_pump,0)}</td>
-      <td>$${num(r.avg_liq,0)}</td>
-      <td class="${cls(r.avg_peak)}">${pct(r.avg_peak,0)}</td>
-      <td class="${cls(r.avg_h1)}">${pct(r.avg_h1)}</td>
-      <td>${num(r.win_rate,0)}%</td>
-      <td class="${Number(r.rugs)>0?'neg':'pos'}">${num(r.rugs,0)}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#goldenBox").innerHTML=h;
+// ---- EVENTS ----
+async function loadEvents(){
+  const rows = await sel("live_events", q=>q.order("created_at",{ascending:false}).limit(50));
+  const box=document.getElementById("evBox"); const arr=Array.isArray(rows)?rows:[];
+  box.innerHTML = arr.length? arr.map(e=>`<div class="ev">
+    <span class="lv-${esc(e.level)}">[${esc(e.level)}]</span> ${esc(e.message)}
+    <div class="t">${esc(e.source)} · ${when(e.created_at)}</div></div>`).join("") : '<span class="muted">ยังไม่มีเหตุการณ์</span>';
 }
 
-/* ---------- LIQUIDITY DRAIN + EDGE ---------- */
-function rDrain(d){
-  if(!d.length){$("#drainBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<div class="cards">`;
-  d.forEach(r=>{
-    const c=Number(r.avg_pnl)>20?'var(--mint)':Number(r.avg_pnl)<-30?'var(--coral)':'var(--amber)';
-    h+=`<div class="card"><h4>${esc(r.liq_trend)}</h4>
-      <div class="big" style="color:${c}">${pct(r.avg_pnl,0)}</div>
-      <div class="meta">${num(r.coins,0)} เหรียญ · win ${num(r.win_rate,0)}%</div></div>`;
-  });
-  h+=`</div><div class="callout">💡 <b>edge จริง:</b> liquidity กำลังไหลออก = ตายเกือบแน่ (win 0%) · liquidity เพิ่มขึ้น = ชนะเกือบ 100% — ถ้าเฝ้า liq real-time แล้วขายทันทีที่เริ่มหาย จะหนี rug ได้เกือบทุกตัว</div>`;
-  $("#drainBox").innerHTML=h;
-}
-function rEdge(d){
-  if(!d.length){$("#edgeBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<table><thead><tr><th>ระดับ liq</th><th>เหรียญ</th><th>slippage</th><th>trail30 (ดิบ)</th><th>trail30 (จริง)</th><th>win จริง</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.liq_tier)}</b></td><td>${num(r.coins,0)}</td>
-      <td class="neg">-${num(r.slip_rt)}%</td>
-      <td class="${cls(r.trail30_naive)}">${pct(r.trail30_naive)}</td>
-      <td class="${cls(r.trail30_real)}">${pct(r.trail30_real)}</td>
-      <td>${num(r.win_real,0)}%</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#edgeBox").innerHTML=h;
+// ---- generic table renderer ----
+function tableHTML(rows){
+  if(rows.__err) return `<div class="err">โหลดไม่ได้: ${esc(rows.__err)}</div>`;
+  if(!rows.length) return '<div class="muted">ไม่มีข้อมูล</div>';
+  const cols=Object.keys(rows[0]);
+  const num=c=>typeof rows[0][c]==="number";
+  return `<table><thead><tr>${cols.map(c=>`<th class="${num(c)?'num':''}">${esc(c)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${cols.map(c=>{
+      let v=r[c]; if(v&&typeof v==="object") v=JSON.stringify(v);
+      const isNum=typeof r[c]==="number";
+      return `<td class="${isNum?'num mono':''}">${esc(isNum?n(r[c],4):v)}</td>`;
+    }).join("")}</tr>`).join("")}</tbody></table>`;
 }
 
-/* ---------- RUG ESCAPE + HOLDTIME ---------- */
-function rRug(d){
-  if(!d.length){$("#rugBox").innerHTML='<div class="err">ยังไม่มีเคส rug</div>';return;}
-  let h=`<table><thead><tr><th>ประเภท rug</th><th>เหรียญ</th><th>entry pump</th><th>นาทีก่อนร่วง</th><th>ออก 15%</th><th>trail 25%</th><th>ถือยาว</th><th>trail ช่วย</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.rug_type)}</b></td><td>${num(r.coins,0)}</td>
-      <td>${pct(r.avg_entry_pump,0)}</td><td>${num(r.avg_min_to_crash,0)}</td>
-      <td class="${cls(r.exit15_result)}">${pct(r.exit15_result)}</td>
-      <td class="${cls(r.trail25_result)}">${pct(r.trail25_result)}</td>
-      <td class="${cls(r.hold_result)}">${pct(r.hold_result)}</td>
-      <td class="${cls(r.trail_saved)}">${pct(r.trail_saved)}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#rugBox").innerHTML=h;
-}
-function rHold(d){
-  if(!d.length){$("#holdBox").innerHTML='<div class="err">ไม่มีข้อมูล</div>';return;}
-  let h=`<table><thead><tr><th>กลุ่ม</th><th>เหรียญ</th><th>15น</th><th>30น</th><th>60น</th><th>1ชม</th><th>6ชม</th><th>24ชม</th></tr></thead><tbody>`;
-  d.forEach(r=>{
-    h+=`<tr><td><b>${esc(r.grp)}</b></td><td>${num(r.coins,0)}</td>
-      <td class="${cls(r.t15m)}">${pct(r.t15m)}</td>
-      <td class="${cls(r.t30m)}">${pct(r.t30m)}</td>
-      <td class="${cls(r.t60m)}">${pct(r.t60m)}</td>
-      <td class="${cls(r.h1)}">${pct(r.h1)}</td>
-      <td class="${cls(r.h6)}">${pct(r.h6)}</td>
-      <td class="${cls(r.h24)}"><b>${pct(r.h24)}</b></td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  $("#holdBox").innerHTML=h;
+// ---- PROOF ----
+const SUITE=["analysis_executive_summary","analysis_risk_profile","analysis_danger_filter","analysis_rug_signals","analysis_rug_escape","analysis_age_buckets","analysis_liquidity_buckets","analysis_peak_speed","analysis_best_exit_per_coin","analysis_exit_win_count","meme_version_compare","proof_golden_filter","proof_liquidity_edge","proof_liquidity_guard","proof_liq_guard_per_coin","proof_liquidity_drain","proof_holdtime_curve","proof_time_of_day"];
+async function loadProof(){
+  const sd = await sel("proof_strategy_showdown", q=>q.limit(50));
+  document.getElementById("showdownBox").innerHTML = tableHTML(sd);
+  const gr = await sel("grid_search_results", q=>q.order("net_pnl",{ascending:false}).limit(30));
+  document.getElementById("gridBox").innerHTML = tableHTML(gr);
+  const box=document.getElementById("suiteBox"); box.innerHTML="";
+  for(const v of SUITE){
+    const d=document.createElement("details");
+    d.innerHTML=`<summary>${v}</summary><div class="scroll"><div class="muted">แตะเพื่อโหลด…</div></div>`;
+    d.addEventListener("toggle",async()=>{
+      if(d.open && !d.dataset.loaded){ d.dataset.loaded="1";
+        const rows=await sel(v,q=>q.limit(50)); d.querySelector("div.scroll").innerHTML=tableHTML(rows); }
+    });
+    box.appendChild(d);
+  }
 }
 
-/* ---------- RULEBOOK (derived live) ---------- */
-function rRules(ctx){
-  const golden=(ctx.golden||[]).find(r=>String(r.filter_level).includes("2/3"))||{};
-  const drainRug=(ctx.drain||[]).find(r=>String(r.liq_trend).includes("รug")||String(r.liq_trend).includes(">50"))||(ctx.drain||[])[0]||{};
-  const drainUp=(ctx.drain||[]).find(r=>String(r.liq_trend).includes("เพิ่ม"))||{};
-  const hold=(ctx.hold||[]).find(r=>r.grp==="pump<20")||{};
-  const sample=(ctx.sample||[])[0]||{};
-  const robust=(ctx.grid||[]).filter(r=>Number(r.net_drop_best)>0).sort((a,b)=>Number(b.net_drop_best)-Number(a.net_drop_best))[0];
-
-  let h=`
-  <div class="rb">
-    <h3>เข้า · ENTRY</h3>
-    <div class="rule">pump &lt; 20% + อายุ 4-12 ชม. + liquidity ≥ 60k</div>
-    <div class="ev">ผ่าน 2/3 กฎ → win <b>${num(golden.win_rate,0)}%</b>, h1 avg <b>${pct(golden.avg_h1)}</b>, rug <b>${num(golden.rugs,0)}</b> ตัว · ยิ่งผ่านครบ ผลยิ่งดี</div>
-  </div>
-  <div class="rb exit">
-    <h3>ออก · EXIT</h3>
-    <div class="rule">trailing stop 30% — หรือ liquidity-guard: ขายทันทีที่ liq หาย &gt;15%</div>
-    <div class="ev">${robust?`grid search ตัวทนสุด: <b>${esc(robust.entry_rule)} + ${esc(robust.exit_rule)}</b> (net หักตัวดีสุด ${pct(robust.net_drop_best)})`:'⚠️ ยังไม่มีกลยุทธ์ใด robust พอ (net หักตัวดีสุดยังไม่บวก)'}</div>
-  </div>
-  <div class="rb avoid">
-    <h3>เลี่ยง · AVOID</h3>
-    <div class="rule">เหรียญที่ liquidity กำลังไหลออก = ตายแน่ (rug zone)</div>
-    <div class="ev">liq หาย &gt;50% → ผลเฉลี่ย <b>${pct(drainRug.avg_pnl,0)}</b>, win <b>${num(drainRug.win_rate,0)}%</b> · ตรงข้าม liq เพิ่ม &gt;20% → <b>${pct(drainUp.avg_pnl,0)}</b>, win <b>${num(drainUp.win_rate,0)}%</b></div>
-  </div>
-  <div class="rb never">
-    <h3>ห้ามเด็ดขาด · NEVER</h3>
-    <div class="rule">อย่าถือ memecoin เกิน 6 ชม.</div>
-    <div class="ev">pump&lt;20 ถือ 24 ชม. → <b>${pct(hold.h24)}</b> (หายนะ) · จุดคุ้มสุดคือออกภายใน 1-6 ชม.</div>
-  </div>
-  <div class="note">📌 ความเชื่อมั่นปัจจุบัน: complete path <b>${num(sample.complete_paths,0)}/${num(sample.target_signals,0)}</b> (${num(sample.pct_to_target,0)}%) · ${esc(sample.confidence_level||"")} — กฎเหล่านี้คือ "ดีที่สุดเท่าที่ข้อมูลมี" ปล่อยให้ v3/v5 เก็บถึง 50-100 เหรียญแล้วเช็กซ้ำ ถ้ากฎยังเหมือนเดิม = ของจริง</div>`;
-  $("#rulesBox").innerHTML=h;
+// ---- RULES ----
+async function loadRules(){
+  const rows = await sel("memebot_rulebook", q=>q.order("section",{ascending:true}).order("ordr",{ascending:true}));
+  const box=document.getElementById("ruleBox"); const arr=Array.isArray(rows)?rows:[];
+  if(!arr.length){ box.innerHTML='<span class="muted">ยังไม่มี rulebook</span>'; return; }
+  const bySec={}; arr.forEach(r=>{(bySec[r.section]=bySec[r.section]||[]).push(r);});
+  box.innerHTML = Object.entries(bySec).map(([sec,items])=>`<h3>${esc(sec)}</h3>`+
+    items.map(r=>`<div class="rule"><div class="ttl">${esc(r.title)}</div><div class="ct">${esc(r.content)}</div></div>`).join("")).join("");
 }
 
-/* ---------- LOAD ---------- */
-async function load(){
-  const ctx={};
-  const tasks=[
-    ["proof_sample_status?select=*","sample",rSample,"sampleBox"],
-    ["meme_version_compare?select=*","ver",rVer,"verBox"],
-    ["proof_liquidity_guard?select=*","guard",rGuard,"guardBox"],
-    ["proof_liq_guard_per_coin?select=*&order=guard_saved.desc.nullslast&limit=15","guardcoin",rGuardCoin,"guardCoinBox"],
-    ["strategy_grid_search?select=*&order=net_pnl.desc&limit=12","grid",rGrid,"gridBox"],
-    ["proof_golden_filter?select=*","golden",rGolden,"goldenBox"],
-    ["proof_liquidity_drain?select=*","drain",rDrain,"drainBox"],
-    ["proof_liquidity_edge?select=*","edge",rEdge,"edgeBox"],
-    ["analysis_rug_escape?select=*","rug",rRug,"rugBox"],
-    ["proof_holdtime_curve?select=*","hold",rHold,"holdBox"],
-  ];
-  let ok=0;
-  await Promise.all(tasks.map(async([path,key,fn,box])=>{
-    try{const d=await get(path);ctx[key]=d;fn(d);ok++;}
-    catch(e){panelErr(box,e);}
-  }));
-  try{rRules(ctx);}catch(e){panelErr("rulesBox",e);}
-  $("#liveTxt").textContent=ok+"/"+tasks.length+" แผง · LIVE";
-  $("#ts").textContent=new Date().toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"});
+// ---- orchestration ----
+async function loadAll(){
+  document.getElementById("updated").textContent="กำลังโหลด…";
+  await Promise.allSettled([loadStatus(),loadTrades(),loadSignals(),loadEvents(),loadProof(),loadRules()]);
+  document.getElementById("updated").textContent="อัปเดตล่าสุด "+new Date().toLocaleTimeString("th-TH");
 }
-load();
-setInterval(load,120000);
+document.getElementById("tabs").addEventListener("click",e=>{
+  const t=e.target.dataset.t; if(!t) return;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("active",s.id===t));
+});
+document.getElementById("refresh").addEventListener("click",loadAll);
+loadAll();
+setInterval(loadAll,30000);
 </script>
 </body>
 </html>
