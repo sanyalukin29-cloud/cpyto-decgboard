@@ -101,6 +101,15 @@
   .sig-off .dot{background:var(--coral);animation:blink 1.1s infinite}
   .sig-unknown{color:var(--mut);border-color:var(--line2)}
   .sig-unknown .dot{background:var(--mut)}
+  .poscard{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;background:var(--panel2)}
+  .poscard .top{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+  .poscard .sym{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.5px;color:var(--tx)}
+  .poscard .big{font-family:var(--disp);font-weight:700;font-size:27px;margin:3px 0 7px}
+  .poscard .row{font-family:var(--mono);font-size:11.5px;color:var(--mut);line-height:1.85}
+  .poscard .row b{color:var(--tx);font-weight:600}
+  .poscard .up{color:var(--jade)} .poscard .down{color:var(--coral)}
+  .stopbar{height:6px;border-radius:4px;background:var(--line);margin:8px 0 4px;overflow:hidden;position:relative}
+  .stopbar > i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;display:block}
   .statusmeta{font-family:var(--mono);font-size:11px;color:var(--mut)}
   .statusmeta b{color:var(--tx);font-weight:500}
   .refresh{font-family:var(--mono);font-size:11px;color:var(--mut);background:var(--raised);border:1px solid var(--line);
@@ -299,9 +308,9 @@
     <!-- TRADES -->
     <section id="trades">
       <div class="panel">
-        <div class="eyebrow">Open positions</div>
+        <div class="eyebrow">Open positions · กำไรสด</div>
         <h2>ไม้ที่เปิดอยู่</h2>
-        <div class="scroll"><table id="openTbl"><thead></thead><tbody></tbody></table></div>
+        <div id="openBox"></div>
       </div>
       <div class="panel">
         <div class="eyebrow">History</div>
@@ -452,15 +461,52 @@ function renderInsight(s,ss,sigs){
 
 /* ---------- trades ---------- */
 let chart;
+async function dexPrice(token){
+  try{
+    const r=await fetch(`https://api.dexscreener.com/latest/dex/tokens/${token}`);
+    const j=await r.json();
+    const p=j&&j.pairs&&j.pairs[0];
+    if(!p)return null;
+    return {price:Number(p.priceUsd), liq:p.liquidity?Number(p.liquidity.usd):null};
+  }catch(e){return null;}
+}
+function fmtPx(v){return "$"+Number(v).toPrecision(4);}
 async function loadTrades(){
   const open=await sel("live_trades",q=>q.eq("status","open").order("opened_at",{ascending:false}));
-  const oh=document.querySelector("#openTbl thead"),ob=document.querySelector("#openTbl tbody");
-  oh.innerHTML="<tr><th>เหรียญ</th><th>โหมด</th><th class='num'>ราคาเข้า</th><th class='num'>ขนาด</th><th class='num'>Stop</th><th>เปิดเมื่อ</th></tr>";
+  const openBox=document.getElementById("openBox");
   const oa=Array.isArray(open)?open:[];
-  ob.innerHTML=oa.length?oa.map(t=>`<tr><td>${esc(t.symbol)}</td><td><span class="chip mode">${esc(t.mode)}</span></td>
-    <td class="num">${t.entry_price!=null?Number(t.entry_price).toExponential(3):"—"}</td><td class="num">${usd(t.entry_amount_usd)}</td>
-    <td class="num">${t.trailing_stop_price!=null?Number(t.trailing_stop_price).toExponential(3):"—"}</td><td class="mono">${tnum(t.opened_at)}</td></tr>`).join("")
-    :`<tr><td colspan="6" class="empty">ยังไม่มีไม้เปิดอยู่ — รอสัญญาณที่ผ่านการกรอง</td></tr>`;
+  if(!oa.length){
+    openBox.innerHTML=`<div class="empty">ยังไม่มีไม้เปิดอยู่ — รอสัญญาณที่ผ่านการกรอง</div>`;
+  }else{
+    const cards=await Promise.all(oa.map(async t=>{
+      const entry=Number(t.entry_price), size=Number(t.entry_amount_usd||0);
+      const peak=t.trailing_peak_price!=null?Number(t.trailing_peak_price):null;
+      const stop=t.trailing_stop_price!=null?Number(t.trailing_stop_price):null;
+      const d=await dexPrice(t.token_address);
+      let body;
+      if(d&&d.price&&entry){
+        const cur=d.price;
+        const pnlPct=(cur/entry-1)*100, pnlUsd=size*(cur/entry-1);
+        const peakPct=peak?(peak/entry-1)*100:null;
+        const stopPct=stop?(stop/entry-1)*100:null;
+        const toStop=stop?(stop/cur-1)*100:null;
+        const c=pnlPct>=0?"up":"down";
+        let barPct=50;
+        if(peak&&stop&&peak>stop){barPct=Math.max(0,Math.min(100,(cur-stop)/(peak-stop)*100));}
+        const barColor=pnlPct>=0?"var(--jade)":"var(--coral)";
+        body=`<div class="big ${c}">${pnlPct>=0?"+":""}${pnlPct.toFixed(1)}% <span style="font-size:15px;font-weight:600">(${pnlUsd>=0?"+":""}$${pnlUsd.toFixed(2)})</span></div>
+          <div class="row">เข้า <b>${fmtPx(entry)}</b> → ตอนนี้ <b>${fmtPx(cur)}</b></div>
+          <div class="stopbar"><i style="width:${barPct}%;background:${barColor}"></i></div>
+          <div class="row">peak <b>${peakPct!=null?(peakPct>=0?"+":"")+peakPct.toFixed(1)+"%":"—"}</b> · stop <b>${stopPct!=null?(stopPct>=0?"+":"")+stopPct.toFixed(1)+"%":"—"}</b>${toStop!=null?` · ราคาเหลือ ${toStop.toFixed(1)}% ถึง stop`:""}</div>
+          <div class="row">ขนาด <b>$${size}</b> · liq ${d.liq!=null?"$"+Math.round(d.liq).toLocaleString():"—"} · เปิด ${tnum(t.opened_at)}</div>`;
+      }else{
+        body=`<div class="row" style="color:var(--amber)">ดึงราคาสดไม่ได้ชั่วคราว (ลองรีเฟรช)</div>
+          <div class="row">เข้า <b>${entry?fmtPx(entry):"—"}</b> · stop <b>${stop!=null?fmtPx(stop):"—"}</b> · ขนาด <b>$${size}</b> · เปิด ${tnum(t.opened_at)}</div>`;
+      }
+      return `<div class="poscard"><div class="top"><span class="sym">${esc(t.symbol)}</span><span class="chip mode">${esc(t.mode)}</span></div>${body}</div>`;
+    }));
+    openBox.innerHTML=cards.join("");
+  }
 
   const closed=await sel("live_trades",q=>q.eq("status","closed").order("closed_at",{ascending:false}).limit(100));
   const ch=document.querySelector("#closedTbl thead"),cb=document.querySelector("#closedTbl tbody");
